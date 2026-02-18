@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://c8cc6i2nr504w" path="res://scripts/left_paddle.gd" id="2_21v6b"]
 [ext_resource type="Theme" uid="uid://b4usp2gaytnco" path="res://themes/menu_theme.tres" id="2_bgrh2"]
 [ext_resource type="Script" uid="uid://dtsyqonbl0iec" path="res://scripts/right_paddle.gd" id="3_gq280"]
+[ext_resource type="Script" uid="uid://y74ovt2abtsj" path="res://scripts/ball.gd" id="4_gq280"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bgrh2"]
 size = Vector2(30, 100)
@@ -11,13 +12,16 @@ size = Vector2(30, 100)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u52xp"]
 size = Vector2(30, 100)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cphvb"]
+size = Vector2(25, 25)
+
 [node name="Manager" type="Node" unique_id=2057561498]
 script = ExtResource("1_bdh1m")
 
 [node name="Game" type="Node2D" parent="." unique_id=1241498537]
 visible = false
 
-[node name="Left" type="StaticBody2D" parent="Game" unique_id=2058407332]
+[node name="Left" type="StaticBody2D" parent="Game" unique_id=1203054200]
 script = ExtResource("2_21v6b")
 
 [node name="Box" type="ColorRect" parent="Game/Left" unique_id=1109662958]
@@ -28,7 +32,7 @@ offset_bottom = 100.0
 position = Vector2(15, 50)
 shape = SubResource("RectangleShape2D_bgrh2")
 
-[node name="Right" type="StaticBody2D" parent="Game" unique_id=2058334912]
+[node name="Right" type="StaticBody2D" parent="Game" unique_id=130231844]
 position = Vector2(1122, 0)
 script = ExtResource("3_gq280")
 
@@ -39,6 +43,18 @@ offset_bottom = 100.0
 [node name="Form" type="CollisionShape2D" parent="Game/Right" unique_id=1504332203]
 position = Vector2(15, 50)
 shape = SubResource("RectangleShape2D_u52xp")
+
+[node name="Ball" type="CharacterBody2D" parent="Game" unique_id=733338226]
+position = Vector2(576, 324)
+script = ExtResource("4_gq280")
+
+[node name="Box" type="ColorRect" parent="Game/Ball" unique_id=885079526]
+offset_right = 25.0
+offset_bottom = 25.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Ball" unique_id=913783704]
+position = Vector2(12.5, 12.5)
+shape = SubResource("RectangleShape2D_cphvb")
 
 [node name="Menu" type="Control" parent="." unique_id=943272792]
 layout_mode = 3
