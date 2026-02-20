@@ -5,42 +5,21 @@
 [ext_resource type="Theme" uid="uid://b4usp2gaytnco" path="res://themes/menu_theme.tres" id="2_bgrh2"]
 [ext_resource type="Script" uid="uid://dtsyqonbl0iec" path="res://scripts/right_paddle.gd" id="3_gq280"]
 [ext_resource type="Script" uid="uid://y74ovt2abtsj" path="res://scripts/ball.gd" id="4_gq280"]
-[ext_resource type="Script" uid="uid://tpswf3j8cluc" path="res://scripts/point_zone_left.gd" id="5_cphvb"]
-[ext_resource type="Script" uid="uid://d3l1apje7ogmx" path="res://scripts/point_zone_right.gd" id="6_o1c0c"]
+[ext_resource type="Script" uid="uid://tpswf3j8cluc" path="res://scenes/point_zone_left.gd" id="5_cphvb"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o1c0c"]
-radius = 13.0
-height = 98.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bgrh2"]
+size = Vector2(30, 100)
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_j5tnm"]
-radius = 13.0
-height = 98.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u52xp"]
+size = Vector2(30, 100)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_xiihq"]
-radius = 11.510864
-
-[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_cphvb"]
-normal = Vector2(1, 0)
-distance = -28.004883
-
-[sub_resource type="LabelSettings" id="LabelSettings_j5tnm"]
-font_size = 42
-
-[sub_resource type="LabelSettings" id="LabelSettings_xiihq"]
-font_size = 35
-shadow_size = 10
-shadow_color = Color(0, 0, 0, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_o1c0c"]
-font_size = 35
-shadow_size = 8
-shadow_color = Color(0, 0, 0, 1)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cphvb"]
+size = Vector2(25, 25)
 
 [node name="Manager" type="Node" unique_id=2057561498]
 script = ExtResource("1_bdh1m")
 
 [node name="Game" type="Node2D" parent="." unique_id=1241498537]
-visible = false
 
 [node name="Left" type="StaticBody2D" parent="Game" unique_id=1203054200]
 script = ExtResource("2_21v6b")
@@ -51,7 +30,7 @@ offset_bottom = 100.0
 
 [node name="Form" type="CollisionShape2D" parent="Game/Left" unique_id=1270465579]
 position = Vector2(15, 50)
-shape = SubResource("CapsuleShape2D_o1c0c")
+shape = SubResource("RectangleShape2D_bgrh2")
 
 [node name="Right" type="StaticBody2D" parent="Game" unique_id=130231844]
 position = Vector2(1122, 0)
@@ -63,11 +42,10 @@ offset_bottom = 100.0
 
 [node name="Form" type="CollisionShape2D" parent="Game/Right" unique_id=1504332203]
 position = Vector2(15, 50)
-shape = SubResource("CapsuleShape2D_j5tnm")
+shape = SubResource("RectangleShape2D_u52xp")
 
 [node name="Ball" type="CharacterBody2D" parent="Game" unique_id=733338226]
-position = Vector2(570, 304)
-collision_layer = 3
+position = Vector2(576, 324)
 script = ExtResource("4_gq280")
 
 [node name="Box" type="ColorRect" parent="Game/Ball" unique_id=885079526]
@@ -76,10 +54,9 @@ offset_bottom = 25.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Ball" unique_id=913783704]
 position = Vector2(12.5, 12.5)
-shape = SubResource("CircleShape2D_xiihq")
+shape = SubResource("RectangleShape2D_cphvb")
 
 [node name="Point Zone Left" type="Area2D" parent="Game" unique_id=1496323349]
-position = Vector2(-19, 300)
 script = ExtResource("5_cphvb")
 
 [node name="Timer" type="Timer" parent="Game/Point Zone Left" unique_id=898571973]
@@ -87,57 +64,9 @@ wait_time = 0.5
 one_shot = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Point Zone Left" unique_id=693358957]
-position = Vector2(47, -300)
-shape = SubResource("WorldBoundaryShape2D_cphvb")
-
-[node name="Point Zone Right" type="Area2D" parent="Game" unique_id=53522906]
-position = Vector2(1155, 307.99997)
-rotation = 3.1406353
-collision_mask = 2
-script = ExtResource("6_o1c0c")
-
-[node name="Timer" type="Timer" parent="Game/Point Zone Right" unique_id=1908999323]
-wait_time = 0.5
-one_shot = true
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Point Zone Right" unique_id=802698436]
-position = Vector2(30.703196, 310.02954)
-shape = SubResource("WorldBoundaryShape2D_cphvb")
-
-[node name="Score" type="Label" parent="Game" unique_id=2064080017]
-offset_left = 516.0
-offset_right = 636.0
-offset_bottom = 100.0
-text = "Score"
-label_settings = SubResource("LabelSettings_j5tnm")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="right_label" type="Label" parent="Game" unique_id=1174112358]
-offset_left = 636.0
-offset_top = 100.0
-offset_right = 736.0
-offset_bottom = 200.0
-size_flags_horizontal = 0
-label_settings = SubResource("LabelSettings_xiihq")
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="left_lable" type="Label" parent="Game" unique_id=525384277]
-offset_left = 416.0
-offset_top = 100.0
-offset_right = 516.0
-offset_bottom = 201.0
-size_flags_horizontal = 0
-text = "
-"
-label_settings = SubResource("LabelSettings_o1c0c")
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
 
 [node name="Menu" type="Control" parent="." unique_id=943272792]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -252,11 +181,6 @@ offset_bottom = 36.0
 grow_horizontal = 0
 text = "Quit to Desktop"
 
-[connection signal="body_entered" from="Game/Point Zone Left" to="Game/Point Zone Left" method="_on_body_entered"]
-[connection signal="timeout" from="Game/Point Zone Left/Timer" to="Game/Point Zone Left" method="_on_timer_timeout"]
-[connection signal="body_entered" from="Game/Point Zone Right" to="Game/Point Zone Right" method="_on_body_entered"]
-[connection signal="timeout" from="Game/Point Zone Right/Timer" to="Game/Point Zone Right" method="_on_timer_timeout"]
-[connection signal="draw" from="Game/left_lable" to="Game/Point Zone Right" method="_on_label_draw"]
 [connection signal="pressed" from="Menu/Multiplayer/Join" to="." method="browse_lobby_list"]
 [connection signal="pressed" from="Menu/Main/Local" to="." method="start_local_game"]
 [connection signal="pressed" from="Menu/Main/Online" to="." method="view_multiplayer_menu"]
