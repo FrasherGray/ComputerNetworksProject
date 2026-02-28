@@ -1,0 +1,186 @@
+[gd_scene format=3 uid="uid://fcku3xu32q7s"]
+
+[ext_resource type="Script" uid="uid://dvuo2bc61gasv" path="res://scripts/manager.gd" id="1_bdh1m"]
+[ext_resource type="Script" uid="uid://c8cc6i2nr504w" path="res://scripts/left_paddle.gd" id="2_21v6b"]
+[ext_resource type="Theme" uid="uid://b4usp2gaytnco" path="res://themes/menu_theme.tres" id="2_bgrh2"]
+[ext_resource type="Script" uid="uid://dtsyqonbl0iec" path="res://scripts/right_paddle.gd" id="3_gq280"]
+[ext_resource type="Script" uid="uid://y74ovt2abtsj" path="res://scripts/ball.gd" id="4_gq280"]
+[ext_resource type="Script" uid="uid://tpswf3j8cluc" path="res://scenes/point_zone_left.gd" id="5_cphvb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bgrh2"]
+size = Vector2(30, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u52xp"]
+size = Vector2(30, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cphvb"]
+size = Vector2(25, 25)
+
+[node name="Manager" type="Node" unique_id=2057561498]
+script = ExtResource("1_bdh1m")
+
+[node name="Game" type="Node2D" parent="." unique_id=1241498537]
+
+[node name="Left" type="StaticBody2D" parent="Game" unique_id=1203054200]
+script = ExtResource("2_21v6b")
+
+[node name="Box" type="ColorRect" parent="Game/Left" unique_id=1109662958]
+offset_right = 30.0
+offset_bottom = 100.0
+
+[node name="Form" type="CollisionShape2D" parent="Game/Left" unique_id=1270465579]
+position = Vector2(15, 50)
+shape = SubResource("RectangleShape2D_bgrh2")
+
+[node name="Right" type="StaticBody2D" parent="Game" unique_id=130231844]
+position = Vector2(1122, 0)
+script = ExtResource("3_gq280")
+
+[node name="Box" type="ColorRect" parent="Game/Right" unique_id=782032229]
+offset_right = 30.0
+offset_bottom = 100.0
+
+[node name="Form" type="CollisionShape2D" parent="Game/Right" unique_id=1504332203]
+position = Vector2(15, 50)
+shape = SubResource("RectangleShape2D_u52xp")
+
+[node name="Ball" type="CharacterBody2D" parent="Game" unique_id=733338226]
+position = Vector2(576, 324)
+script = ExtResource("4_gq280")
+
+[node name="Box" type="ColorRect" parent="Game/Ball" unique_id=885079526]
+offset_right = 25.0
+offset_bottom = 25.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Ball" unique_id=913783704]
+position = Vector2(12.5, 12.5)
+shape = SubResource("RectangleShape2D_cphvb")
+
+[node name="Point Zone Left" type="Area2D" parent="Game" unique_id=1496323349]
+script = ExtResource("5_cphvb")
+
+[node name="Timer" type="Timer" parent="Game/Point Zone Left" unique_id=898571973]
+wait_time = 0.5
+one_shot = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Point Zone Left" unique_id=693358957]
+
+[node name="Menu" type="Control" parent="." unique_id=943272792]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme = ExtResource("2_bgrh2")
+
+[node name="Lobby" type="Control" parent="Menu" unique_id=2120037835]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LobbyList" type="Control" parent="Menu" unique_id=1346924768]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Multiplayer" type="Control" parent="Menu" unique_id=774614608]
+visible = false
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="Host" type="Button" parent="Menu/Multiplayer" unique_id=1793669791]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -26.5
+offset_top = -42.0
+offset_right = 26.5
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Host"
+
+[node name="Join" type="Button" parent="Menu/Multiplayer" unique_id=684391512]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -53.5
+offset_top = 6.0
+offset_right = 53.5
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Join Game"
+
+[node name="Main" type="Control" parent="Menu" unique_id=771440536]
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="Local" type="Button" parent="Menu/Main" unique_id=41734649]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -74.0
+offset_right = 60.0
+offset_bottom = -38.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Local Co-op"
+
+[node name="Online" type="Button" parent="Menu/Main" unique_id=1263895373]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -91.5
+offset_top = -18.0
+offset_right = 91.5
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "WLAN Multiplayer"
+
+[node name="Settings" type="Button" parent="Menu/Main" unique_id=1280553571]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -43.0
+offset_top = 38.0
+offset_right = 43.0
+offset_bottom = 74.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Settings"
+
+[node name="Quit" type="Button" parent="Menu/Main" unique_id=320535795]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -161.0
+offset_bottom = 36.0
+grow_horizontal = 0
+text = "Quit to Desktop"
+
+[connection signal="pressed" from="Menu/Multiplayer/Join" to="." method="browse_lobby_list"]
+[connection signal="pressed" from="Menu/Main/Local" to="." method="start_local_game"]
+[connection signal="pressed" from="Menu/Main/Online" to="." method="view_multiplayer_menu"]
