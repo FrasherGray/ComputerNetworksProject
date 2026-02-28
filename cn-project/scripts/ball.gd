@@ -1,23 +1,40 @@
 extends CharacterBody2D
 
-func _ready() -> void:
+var SPEED = 350
+var rng = RandomNumberGenerator.new()
+@onready var timer: Timer = $Timer
+@onready var timer_2: Timer = $Timer2
+
+
+func _ready():
+	set_physics_process(false)
 	randomize()
-	velocity = Vector2(250, 250)
+	
+	# Pick a random angle increment of 45 degrees
+	var angle = [1,4,7,11].pick_random() * 30
+	print(angle)
+	
+	#convert to red
+	var rad = deg_to_rad(angle)
+	var direction = Vector2(cos(rad), sin(rad))
 
-func _physics_process(delta: float) -> void:
+	velocity = direction.normalized() * SPEED
+
+func _physics_process(delta):
 	var collision = move_and_collide(velocity * delta)
-	
-	if collision == null and not (global_position.y < 0 or global_position.y > 623):
-		return
-		
-	
-	if is_multiplayer_authority():
-		if collision == null:
-			velocity.y = -velocity.y
-		else:
-			velocity = (-velocity + Vector2(randi_range(-5, 5), randi_range(-5, 5))).normalized() * 200
-		set_new_velocity.rpc(velocity)
+	if collision:
+		velocity = velocity.bounce(collision.get_normal())
 
-@rpc("authority", "call_remote", "reliable")
-func set_new_velocity(new_velocity: Vector2) -> void:
-	velocity = new_velocity
+func _on_timer_timeout():
+	if(SPEED >= 500):
+		SPEED = 500
+	else:
+		SPEED += 10
+	print(SPEED)
+	velocity = velocity.normalized() * SPEED
+	
+func _on_timer_2_timeout():
+	print("timer2")
+	set_physics_process(true)
+	$Timer.start()
+	$Timer2.stop()

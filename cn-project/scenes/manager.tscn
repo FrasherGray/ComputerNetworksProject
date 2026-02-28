@@ -1,20 +1,19 @@
 [gd_scene format=3 uid="uid://fcku3xu32q7s"]
 
 [ext_resource type="Script" uid="uid://dvuo2bc61gasv" path="res://scripts/manager.gd" id="1_bdh1m"]
-[ext_resource type="Script" uid="uid://c8cc6i2nr504w" path="res://scripts/left_paddle.gd" id="2_21v6b"]
+[ext_resource type="Script" uid="uid://ebbhyjjt2shc" path="res://scripts/left_paddle.gd" id="2_21v6b"]
 [ext_resource type="Theme" uid="uid://b4usp2gaytnco" path="res://themes/menu_theme.tres" id="2_bgrh2"]
-[ext_resource type="Script" uid="uid://dtsyqonbl0iec" path="res://scripts/right_paddle.gd" id="3_gq280"]
+[ext_resource type="Script" uid="uid://ck0nmesf0cr6b" path="res://scripts/right_paddle.gd" id="3_gq280"]
 [ext_resource type="Script" uid="uid://y74ovt2abtsj" path="res://scripts/ball.gd" id="4_gq280"]
 [ext_resource type="Script" uid="uid://tpswf3j8cluc" path="res://scripts/point_zone_left.gd" id="5_cphvb"]
 [ext_resource type="Script" uid="uid://d3l1apje7ogmx" path="res://scripts/point_zone_right.gd" id="6_o1c0c"]
+[ext_resource type="Script" uid="uid://w6a6vchxwvt2" path="res://scripts/server_browser.gd" id="8_j5tnm"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o1c0c"]
-radius = 13.0
-height = 98.0
+height = 92.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_j5tnm"]
-radius = 13.0
-height = 98.0
+height = 94.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xiihq"]
 radius = 11.510864
@@ -22,6 +21,12 @@ radius = 11.510864
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_cphvb"]
 normal = Vector2(1, 0)
 distance = -28.004883
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o1c0c"]
+size = Vector2(1151, 11)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j5tnm"]
+size = Vector2(1151, 20)
 
 [sub_resource type="LabelSettings" id="LabelSettings_j5tnm"]
 font_size = 42
@@ -36,13 +41,27 @@ font_size = 35
 shadow_size = 8
 shadow_color = Color(0, 0, 0, 1)
 
+[sub_resource type="GDScript" id="GDScript_j5tnm"]
+script/source = "extends Timer
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
 [node name="Manager" type="Node" unique_id=2057561498]
 script = ExtResource("1_bdh1m")
 
 [node name="Game" type="Node2D" parent="." unique_id=1241498537]
 visible = false
 
-[node name="Left" type="StaticBody2D" parent="Game" unique_id=1203054200]
+[node name="Left" type="CharacterBody2D" parent="Game" unique_id=715404903]
 script = ExtResource("2_21v6b")
 
 [node name="Box" type="ColorRect" parent="Game/Left" unique_id=1109662958]
@@ -53,7 +72,7 @@ offset_bottom = 100.0
 position = Vector2(15, 50)
 shape = SubResource("CapsuleShape2D_o1c0c")
 
-[node name="Right" type="StaticBody2D" parent="Game" unique_id=130231844]
+[node name="Right" type="CharacterBody2D" parent="Game" unique_id=1327815869]
 position = Vector2(1122, 0)
 script = ExtResource("3_gq280")
 
@@ -62,7 +81,7 @@ offset_right = 30.0
 offset_bottom = 100.0
 
 [node name="Form" type="CollisionShape2D" parent="Game/Right" unique_id=1504332203]
-position = Vector2(15, 50)
+position = Vector2(14, 50)
 shape = SubResource("CapsuleShape2D_j5tnm")
 
 [node name="Ball" type="CharacterBody2D" parent="Game" unique_id=733338226]
@@ -77,6 +96,12 @@ offset_bottom = 25.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Ball" unique_id=913783704]
 position = Vector2(12.5, 12.5)
 shape = SubResource("CircleShape2D_xiihq")
+
+[node name="Timer" type="Timer" parent="Game/Ball" unique_id=1269121768]
+wait_time = 5.0
+
+[node name="Timer2" type="Timer" parent="Game/Ball" unique_id=602347389]
+wait_time = 3.0
 
 [node name="Point Zone Left" type="Area2D" parent="Game" unique_id=1496323349]
 position = Vector2(-19, 300)
@@ -103,6 +128,16 @@ one_shot = true
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Point Zone Right" unique_id=802698436]
 position = Vector2(30.703196, 310.02954)
 shape = SubResource("WorldBoundaryShape2D_cphvb")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Game" unique_id=735709460]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/StaticBody2D" unique_id=1554861806]
+position = Vector2(576.5, -6.5)
+shape = SubResource("RectangleShape2D_o1c0c")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Game/StaticBody2D" unique_id=918201004]
+position = Vector2(575.5, 658)
+shape = SubResource("RectangleShape2D_j5tnm")
 
 [node name="Score" type="Label" parent="Game" unique_id=2064080017]
 offset_left = 516.0
@@ -156,6 +191,21 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
+[node name="Join" type="Control" parent="Menu" unique_id=1956085511]
+anchors_preset = 0
+offset_right = 1151.0
+offset_bottom = 651.0
+
+[node name="Server Browser" type="Control" parent="Menu/Join" unique_id=1950035225]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("8_j5tnm")
+
+[node name="Broadcast Timer" type="Timer" parent="Menu/Join/Server Browser" unique_id=20927350]
+autostart = true
+script = SubResource("GDScript_j5tnm")
+
 [node name="Multiplayer" type="Control" parent="Menu" unique_id=774614608]
 visible = false
 anchors_preset = 0
@@ -193,6 +243,7 @@ grow_vertical = 2
 text = "Join Game"
 
 [node name="Main" type="Control" parent="Menu" unique_id=771440536]
+visible = false
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0
@@ -252,11 +303,14 @@ offset_bottom = 36.0
 grow_horizontal = 0
 text = "Quit to Desktop"
 
+[connection signal="timeout" from="Game/Ball/Timer" to="Game/Ball" method="_on_timer_timeout"]
+[connection signal="timeout" from="Game/Ball/Timer2" to="Game/Ball" method="_on_timer_2_timeout"]
 [connection signal="body_entered" from="Game/Point Zone Left" to="Game/Point Zone Left" method="_on_body_entered"]
 [connection signal="timeout" from="Game/Point Zone Left/Timer" to="Game/Point Zone Left" method="_on_timer_timeout"]
 [connection signal="body_entered" from="Game/Point Zone Right" to="Game/Point Zone Right" method="_on_body_entered"]
 [connection signal="timeout" from="Game/Point Zone Right/Timer" to="Game/Point Zone Right" method="_on_timer_timeout"]
 [connection signal="draw" from="Game/left_lable" to="Game/Point Zone Right" method="_on_label_draw"]
+[connection signal="timeout" from="Menu/Join/Server Browser/Broadcast Timer" to="Menu/Join/Server Browser" method="_on_broadcast_timer_timeout"]
 [connection signal="pressed" from="Menu/Multiplayer/Join" to="." method="browse_lobby_list"]
 [connection signal="pressed" from="Menu/Main/Local" to="." method="start_local_game"]
 [connection signal="pressed" from="Menu/Main/Online" to="." method="view_multiplayer_menu"]
