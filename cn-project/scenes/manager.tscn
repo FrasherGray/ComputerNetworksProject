@@ -64,7 +64,7 @@ script = ExtResource("1_bdh1m")
 [node name="Game" type="Node2D" parent="." unique_id=1241498537]
 visible = false
 
-[node name="Left" type="StaticBody2D" parent="Game" unique_id=1203054200]
+[node name="Left" type="CharacterBody2D" parent="Game" unique_id=1203054200]
 script = ExtResource("2_21v6b")
 
 [node name="Box" type="ColorRect" parent="Game/Left" unique_id=1109662958]
@@ -75,7 +75,7 @@ offset_bottom = 100.0
 position = Vector2(15, 50)
 shape = SubResource("CapsuleShape2D_o1c0c")
 
-[node name="Right" type="StaticBody2D" parent="Game" unique_id=130231844]
+[node name="Right" type="CharacterBody2D" parent="Game" unique_id=130231844]
 position = Vector2(1122, 0)
 script = ExtResource("3_gq280")
 
