@@ -55,13 +55,16 @@ func _process(delta: float) -> void:
 	pass
 "
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cphvb"]
+size = Vector2(25, 25)
+
 [node name="Manager" type="Node" unique_id=2057561498]
 script = ExtResource("1_bdh1m")
 
 [node name="Game" type="Node2D" parent="." unique_id=1241498537]
 visible = false
 
-[node name="Left" type="CharacterBody2D" parent="Game" unique_id=715404903]
+[node name="Left" type="StaticBody2D" parent="Game" unique_id=1203054200]
 script = ExtResource("2_21v6b")
 
 [node name="Box" type="ColorRect" parent="Game/Left" unique_id=1109662958]
@@ -72,7 +75,7 @@ offset_bottom = 100.0
 position = Vector2(15, 50)
 shape = SubResource("CapsuleShape2D_o1c0c")
 
-[node name="Right" type="CharacterBody2D" parent="Game" unique_id=1327815869]
+[node name="Right" type="StaticBody2D" parent="Game" unique_id=130231844]
 position = Vector2(1122, 0)
 script = ExtResource("3_gq280")
 
@@ -171,6 +174,18 @@ label_settings = SubResource("LabelSettings_o1c0c")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="Ball" type="CharacterBody2D" parent="Game" unique_id=733338226]
+position = Vector2(576, 324)
+script = ExtResource("4_gq280")
+
+[node name="Box" type="ColorRect" parent="Game/Ball" unique_id=885079526]
+offset_right = 25.0
+offset_bottom = 25.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Ball" unique_id=913783704]
+position = Vector2(12.5, 12.5)
+shape = SubResource("RectangleShape2D_cphvb")
 
 [node name="Menu" type="Control" parent="." unique_id=943272792]
 layout_mode = 3
