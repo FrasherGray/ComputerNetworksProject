@@ -141,13 +141,13 @@ one_shot = true
 position = Vector2(30.703196, 310.02954)
 shape = SubResource("WorldBoundaryShape2D_cphvb")
 
-[node name="StaticBody2D" type="StaticBody2D" parent="Game" unique_id=735709460]
+[node name="Border" type="StaticBody2D" parent="Game" unique_id=735709460]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/StaticBody2D" unique_id=1554861806]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Border" unique_id=1554861806]
 position = Vector2(576.5, -6.5)
 shape = SubResource("RectangleShape2D_o1c0c")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Game/StaticBody2D" unique_id=918201004]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Game/Border" unique_id=918201004]
 position = Vector2(575.5, 658)
 shape = SubResource("RectangleShape2D_j5tnm")
 
@@ -204,6 +204,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Join" type="Control" parent="Menu" unique_id=1956085511]
+visible = false
 anchors_preset = 0
 offset_right = 1151.0
 offset_bottom = 651.0
@@ -255,7 +256,6 @@ grow_vertical = 2
 text = "Join Game"
 
 [node name="Main" type="Control" parent="Menu" unique_id=771440536]
-visible = false
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0
