@@ -1,5 +1,5 @@
 extends Node
-var UDPPacketHandler: PacketPeerStream = PacketPeerStream.new()
+var UDPPacketHandler: PacketPeerUDP = PacketPeerUDP.new()
 @onready var timer_2: Timer = $Game/Ball/Timer2
 
 
