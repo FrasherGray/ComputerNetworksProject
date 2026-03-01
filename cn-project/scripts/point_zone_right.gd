@@ -2,8 +2,6 @@ extends Area2D
 
 @onready var timer = $Timer
 @onready var ball: CharacterBody2D = $"../Ball"
-@onready var left: CharacterBody2D = $"../Left"
-@onready var right: CharacterBody2D = $"../Right"
 @onready var left_lable: Label = $"../left_lable"
 
 var score = 0
