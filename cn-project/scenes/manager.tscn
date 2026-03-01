@@ -9,14 +9,11 @@
 [ext_resource type="Script" uid="uid://d3l1apje7ogmx" path="res://scripts/point_zone_right.gd" id="6_o1c0c"]
 [ext_resource type="Script" uid="uid://w6a6vchxwvt2" path="res://scripts/server_browser.gd" id="8_j5tnm"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_o1c0c"]
-height = 92.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xiihq"]
+size = Vector2(30, 100)
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_j5tnm"]
-height = 94.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_xiihq"]
-radius = 11.510864
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3ftge"]
+size = Vector2(30, 100)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cphvb"]
 size = Vector2(25, 25)
@@ -73,7 +70,7 @@ offset_bottom = 100.0
 
 [node name="Form" type="CollisionShape2D" parent="Game/Left" unique_id=1270465579]
 position = Vector2(15, 50)
-shape = SubResource("CapsuleShape2D_o1c0c")
+shape = SubResource("RectangleShape2D_xiihq")
 
 [node name="Right" type="CharacterBody2D" parent="Game" unique_id=130231844]
 position = Vector2(1122, 0)
@@ -84,8 +81,8 @@ offset_right = 30.0
 offset_bottom = 100.0
 
 [node name="Form" type="CollisionShape2D" parent="Game/Right" unique_id=1504332203]
-position = Vector2(14, 50)
-shape = SubResource("CapsuleShape2D_j5tnm")
+position = Vector2(15, 50)
+shape = SubResource("RectangleShape2D_3ftge")
 
 [node name="Ball" type="CharacterBody2D" parent="Game" unique_id=733338226]
 position = Vector2(570, 304)
@@ -96,10 +93,6 @@ script = ExtResource("4_gq280")
 offset_right = 25.0
 offset_bottom = 25.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Ball" unique_id=913783704]
-position = Vector2(12.5, 12.5)
-shape = SubResource("CircleShape2D_xiihq")
-
 [node name="Timer" type="Timer" parent="Game/Ball" unique_id=1269121768]
 wait_time = 5.0
 
@@ -107,11 +100,7 @@ wait_time = 5.0
 wait_time = 3.0
 one_shot = true
 
-[node name="Box2" type="ColorRect" parent="Game/Ball" unique_id=1439236652]
-offset_right = 25.0
-offset_bottom = 25.0
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Game/Ball" unique_id=561411283]
+[node name="Form" type="CollisionShape2D" parent="Game/Ball" unique_id=561411283]
 position = Vector2(12.5, 12.5)
 shape = SubResource("RectangleShape2D_cphvb")
 
@@ -123,7 +112,7 @@ script = ExtResource("5_cphvb")
 wait_time = 0.5
 one_shot = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Point Zone Left" unique_id=693358957]
+[node name="Form" type="CollisionShape2D" parent="Game/Point Zone Left" unique_id=693358957]
 position = Vector2(47, -300)
 shape = SubResource("WorldBoundaryShape2D_cphvb")
 
@@ -137,17 +126,17 @@ script = ExtResource("6_o1c0c")
 wait_time = 0.5
 one_shot = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Point Zone Right" unique_id=802698436]
+[node name="Form" type="CollisionShape2D" parent="Game/Point Zone Right" unique_id=802698436]
 position = Vector2(30.703196, 310.02954)
 shape = SubResource("WorldBoundaryShape2D_cphvb")
 
 [node name="Border" type="StaticBody2D" parent="Game" unique_id=735709460]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Border" unique_id=1554861806]
+[node name="Top" type="CollisionShape2D" parent="Game/Border" unique_id=1554861806]
 position = Vector2(576.5, -6.5)
 shape = SubResource("RectangleShape2D_o1c0c")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Game/Border" unique_id=918201004]
+[node name="Bottom" type="CollisionShape2D" parent="Game/Border" unique_id=918201004]
 position = Vector2(575.5, 658)
 shape = SubResource("RectangleShape2D_j5tnm")
 

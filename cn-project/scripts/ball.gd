@@ -30,7 +30,6 @@ func _on_timer_timeout():
 		SPEED = 500
 	else:
 		SPEED += 10
-	print(SPEED)
 	velocity = velocity.normalized() * SPEED
 	
 func _on_timer_2_timeout():
