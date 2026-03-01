@@ -18,6 +18,9 @@ height = 94.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_xiihq"]
 radius = 11.510864
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cphvb"]
+size = Vector2(25, 25)
+
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_cphvb"]
 normal = Vector2(1, 0)
 distance = -28.004883
@@ -54,9 +57,6 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 "
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_cphvb"]
-size = Vector2(25, 25)
 
 [node name="Manager" type="Node" unique_id=2057561498]
 script = ExtResource("1_bdh1m")
@@ -105,6 +105,15 @@ wait_time = 5.0
 
 [node name="Timer2" type="Timer" parent="Game/Ball" unique_id=602347389]
 wait_time = 3.0
+one_shot = true
+
+[node name="Box2" type="ColorRect" parent="Game/Ball" unique_id=1439236652]
+offset_right = 25.0
+offset_bottom = 25.0
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Game/Ball" unique_id=561411283]
+position = Vector2(12.5, 12.5)
+shape = SubResource("RectangleShape2D_cphvb")
 
 [node name="Point Zone Left" type="Area2D" parent="Game" unique_id=1496323349]
 position = Vector2(-19, 300)
@@ -174,18 +183,6 @@ label_settings = SubResource("LabelSettings_o1c0c")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
-
-[node name="Ball" type="CharacterBody2D" parent="Game" unique_id=733338226]
-position = Vector2(576, 324)
-script = ExtResource("4_gq280")
-
-[node name="Box" type="ColorRect" parent="Game/Ball" unique_id=885079526]
-offset_right = 25.0
-offset_bottom = 25.0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Game/Ball" unique_id=913783704]
-position = Vector2(12.5, 12.5)
-shape = SubResource("RectangleShape2D_cphvb")
 
 [node name="Menu" type="Control" parent="." unique_id=943272792]
 layout_mode = 3

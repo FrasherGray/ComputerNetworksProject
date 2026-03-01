@@ -37,4 +37,3 @@ func _on_timer_2_timeout():
 	print("timer2")
 	set_physics_process(true)
 	$Timer.start()
-	$Timer2.stop()
