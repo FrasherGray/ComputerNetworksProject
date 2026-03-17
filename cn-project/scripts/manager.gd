@@ -13,4 +13,8 @@ func view_multiplayer_menu() -> void:
 
 func browse_lobby_list() -> void:
 	get_node("Menu/Multiplayer").hide()
-	get_node("Menu/LobbyList").show()
+	get_node("Menu/Join Menu").show()
+
+func _on_sub_menu_join_back_pressed() -> void:
+	get_node("Menu/Join Menu").hide()
+	get_node("Menu/Main").show()
