@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://y74ovt2abtsj" path="res://scripts/ball.gd" id="4_gq280"]
 [ext_resource type="Script" uid="uid://tpswf3j8cluc" path="res://scripts/point_zone_left.gd" id="5_cphvb"]
 [ext_resource type="Script" uid="uid://d3l1apje7ogmx" path="res://scripts/point_zone_right.gd" id="6_o1c0c"]
+[ext_resource type="Script" uid="uid://cvcvfhsh86x5u" path="res://scripts/hosting.gd" id="8_3ftge"]
 [ext_resource type="Script" uid="uid://w6a6vchxwvt2" path="res://scripts/server_browser.gd" id="8_j5tnm"]
 [ext_resource type="Script" uid="uid://cs2sugc56dcpr" path="res://scripts/IP_LIST.gd" id="9_xiihq"]
 
@@ -181,7 +182,56 @@ offset_right = 40.0
 offset_bottom = 40.0
 theme = ExtResource("2_bgrh2")
 
+[node name="Host Menu" type="Control" parent="Menu" unique_id=676045541]
+visible = false
+anchors_preset = 0
+offset_right = 1157.0
+offset_bottom = 657.0
+script = ExtResource("8_3ftge")
+
+[node name="Title" type="Label" parent="Menu/Host Menu" unique_id=1899627282]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 59.0
+offset_right = 236.0
+offset_bottom = 101.0
+text = "HOST GAME:"
+
+[node name="HostName" type="Label" parent="Menu/Host Menu" unique_id=1661397774]
+layout_mode = 0
+offset_left = 102.0
+offset_top = 113.0
+offset_right = 219.0
+offset_bottom = 141.0
+text = "Name:"
+
+[node name="InputedName" type="LineEdit" parent="Menu/Host Menu" unique_id=1590880164]
+layout_mode = 0
+offset_left = 186.0
+offset_top = 106.0
+offset_right = 474.0
+offset_bottom = 142.0
+metadata/_edit_use_anchors_ = true
+
+[node name="Connection" type="Label" parent="Menu/Host Menu" unique_id=2116130531]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 188.0
+offset_right = 486.0
+offset_bottom = 216.0
+text = "Idle Connection"
+metadata/_edit_use_anchors_ = true
+
+[node name="BackMenu" type="Button" parent="Menu/Host Menu" unique_id=1035371794]
+layout_mode = 0
+offset_left = 585.0
+offset_top = 87.0
+offset_right = 745.0
+offset_bottom = 171.0
+text = "BACK"
+
 [node name="Join Menu" type="Control" parent="Menu" unique_id=1956085511]
+visible = false
 anchors_preset = 0
 offset_right = 1151.0
 offset_bottom = 651.0
@@ -267,7 +317,6 @@ grow_vertical = 2
 text = "Join Game"
 
 [node name="Main" type="Control" parent="Menu" unique_id=771440536]
-visible = false
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0
@@ -334,8 +383,11 @@ text = "Quit to Desktop"
 [connection signal="body_entered" from="Game/Point Zone Right" to="Game/Point Zone Right" method="_on_body_entered"]
 [connection signal="timeout" from="Game/Point Zone Right/Timer" to="Game/Point Zone Right" method="_on_timer_timeout"]
 [connection signal="draw" from="Game/left_lable" to="Game/Point Zone Right" method="_on_label_draw"]
+[connection signal="text_submitted" from="Menu/Host Menu/InputedName" to="Menu/Host Menu" method="_on_line_edit_text_submitted"]
+[connection signal="pressed" from="Menu/Host Menu/BackMenu" to="." method="_on_back_menu_pressed"]
 [connection signal="timeout" from="Menu/Join Menu/Server Browser/Broadcast Timer" to="Menu/Join Menu/Server Browser" method="_on_broadcast_timer_timeout"]
 [connection signal="pressed" from="Menu/Join Menu/subMenuJoinBack" to="." method="_on_sub_menu_join_back_pressed"]
+[connection signal="pressed" from="Menu/Multiplayer/Host" to="." method="_on_host_pressed"]
 [connection signal="pressed" from="Menu/Multiplayer/Join" to="." method="browse_lobby_list"]
 [connection signal="pressed" from="Menu/Main/Local" to="." method="start_local_game"]
 [connection signal="pressed" from="Menu/Main/Online" to="." method="view_multiplayer_menu"]
