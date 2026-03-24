@@ -183,7 +183,6 @@ offset_bottom = 40.0
 theme = ExtResource("2_bgrh2")
 
 [node name="Host Menu" type="Control" parent="Menu" unique_id=676045541]
-visible = false
 anchors_preset = 0
 offset_right = 1157.0
 offset_bottom = 657.0
@@ -229,6 +228,14 @@ offset_top = 87.0
 offset_right = 745.0
 offset_bottom = 171.0
 text = "BACK"
+
+[node name="Host" type="Button" parent="Menu/Host Menu" unique_id=510199197]
+layout_mode = 0
+offset_left = 585.0
+offset_top = 176.0
+offset_right = 745.0
+offset_bottom = 260.0
+text = "Host Lobby"
 
 [node name="Join Menu" type="Control" parent="Menu" unique_id=1956085511]
 visible = false
@@ -280,6 +287,14 @@ offset_bottom = 116.0
 text = "Back"
 icon_alignment = 1
 
+[node name="RefreshList" type="Button" parent="Menu/Join Menu" unique_id=1926317012]
+layout_mode = 0
+offset_left = 385.0
+offset_top = 51.0
+offset_right = 575.0
+offset_bottom = 116.0
+text = "Refresh Lobby List"
+
 [node name="Multiplayer" type="Control" parent="Menu" unique_id=774614608]
 visible = false
 anchors_preset = 0
@@ -317,6 +332,7 @@ grow_vertical = 2
 text = "Join Game"
 
 [node name="Main" type="Control" parent="Menu" unique_id=771440536]
+visible = false
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0
