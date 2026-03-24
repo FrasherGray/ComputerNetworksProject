@@ -183,6 +183,7 @@ offset_bottom = 40.0
 theme = ExtResource("2_bgrh2")
 
 [node name="Host Menu" type="Control" parent="Menu" unique_id=676045541]
+visible = false
 anchors_preset = 0
 offset_right = 1157.0
 offset_bottom = 657.0
@@ -332,7 +333,6 @@ grow_vertical = 2
 text = "Join Game"
 
 [node name="Main" type="Control" parent="Menu" unique_id=771440536]
-visible = false
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0

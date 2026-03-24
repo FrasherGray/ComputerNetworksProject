@@ -19,24 +19,31 @@ var lobbyName: String = ""
 var inMenu: bool = false
 
 # Musc Var Declarations
-var UDPPacketHandler: PacketPeerUDP
+var UDPPacketBroadcaster: PacketPeerUDP
+var UDPPackedReceiver: PacketPeerUDP
 @onready var timer_2: Timer = $Game/Ball/Timer2
 
 
 # Multiplayer functions
-func _process(delta: float) -> void:
-	if UDPPacketHandler == null:
+func _ready() -> void:
+	if UDPPackedReceiver.bind(LOBBY_RECEIVER_PORT) == OK:
+		print("Receiver successfully set up")
+	else:
+		print("Receiver failed to bind to receiver port")
+
+func _process(_delta: float) -> void:
+	if UDPPackedReceiver == null:
 		return
 
-	while UDPPacketHandler.get_available_packet_count() > 0:
-		var packet = UDPPacketHandler.get_packet()
-		if UDPPacketHandler.get_packet_error() != 0:
+	while UDPPackedReceiver.get_available_packet_count() > 0:
+		var packet = UDPPackedReceiver.get_packet()
+		if UDPPackedReceiver.get_packet_error() != 0:
 			#discard packet, it's bad/wrong
 			continue
 		if inMenu:
 			if isHost:
 				if packet[0] == 1:
-					sendHostData(UDPPacketHandler.get_packet_ip())
+					sendHostData(UDPPackedReceiver.get_packet_ip())
 			else:
 				if inLobby:
 					if packet[0] == 0: # host closed lobby
@@ -44,10 +51,7 @@ func _process(delta: float) -> void:
 						get_node("Menu/Join Menu").show()
 				else:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())
-					var newLobbyRow: Button = Button.new()
-					newLobbyRow.set_text("Lobby Name: " + packetData["Name"] + "   IP: " + packetData["IP"])
-					newLobbyRow.connect("pressed", join_lobby.bind(packetData["IP"]))
-					get_node("Menu/Join Menu/Panel/ServerInfo").add_child(newLobbyRow)
+					get_node("Menu/Join Menu/Panel").add_row(packetData["Name"], packetData["IP"], 1)
 		match packet[0]:
 			0: # other player moved paddle
 				if multiplayer.get_unique_id() == 1: # other player's paddle is the right one
@@ -58,9 +62,9 @@ func _process(delta: float) -> void:
 				pass
 
 func setupHost() -> bool:
-	UDPPacketHandler = PacketPeerUDP.new()
+	UDPPacketBroadcaster = PacketPeerUDP.new()
 
-	if UDPPacketHandler.bind(LOBBY_BROADCAST_PORT) == OK:
+	if UDPPacketBroadcaster.bind(LOBBY_BROADCAST_PORT) == OK:
 		print("UDP bound successfully")
 		return true
 	else:
@@ -68,11 +72,11 @@ func setupHost() -> bool:
 		return false
 
 func setupClient() -> bool:
-	UDPPacketHandler = PacketPeerUDP.new()
-	UDPPacketHandler.set_broadcast_enabled(true)
-	UDPPacketHandler.set_dest_address("192.168.1.255", LOBBY_RECEIVER_PORT)
+	UDPPacketBroadcaster = PacketPeerUDP.new()
+	UDPPacketBroadcaster.set_broadcast_enabled(true)
+	UDPPacketBroadcaster.set_dest_address("192.168.1.255", LOBBY_RECEIVER_PORT)
 	
-	if UDPPacketHandler.bind(LOBBY_BROADCAST_PORT) == OK:
+	if UDPPacketBroadcaster.bind(LOBBY_BROADCAST_PORT + 1) == OK:
 		print("UDP bound successfully")
 		return true
 	else:
@@ -80,16 +84,16 @@ func setupClient() -> bool:
 		return false
 
 func sendHostData(toIP: String) -> void:
-	if not isHost or UDPPacketHandler == null:
+	if not isHost or UDPPacketBroadcaster == null:
 		return
-	UDPPacketHandler.set_dest_address(toIP, LOBBY_RECEIVER_PORT)
+	UDPPacketBroadcaster.set_dest_address(toIP, LOBBY_RECEIVER_PORT)
 	var roomData: String = JSON.stringify({ "Name": lobbyName, "IP": IP.get_local_addresses()[0] })
-	UDPPacketHandler.put_packet(roomData.to_ascii_buffer())
+	UDPPacketBroadcaster.put_packet(roomData.to_ascii_buffer())
 
 func requestLobbyData() -> void:
 	for child in get_node("Menu/Join Menu/Panel/ServerInfo").get_children():
 		child.queue_free()
-	UDPPacketHandler.put_packet(PackedByteArray([1]))
+	UDPPacketBroadcaster.put_packet(PackedByteArray([1]))
 
 # UI 
 func start_local_game() -> void:
@@ -105,11 +109,13 @@ func browse_lobby_list() -> void:
 	var multiplayerWorks: bool = setupClient()
 	if not multiplayerWorks:
 		return
+	requestLobbyData()
 	get_node("Menu/Multiplayer").hide()
 	get_node("Menu/Join Menu").show()
 
 func join_lobby(ofIP: String) -> void:
-	
+	inLobby = true
+	get_node("Menu/Join Menu").hide()
 
 func _on_sub_menu_join_back_pressed() -> void:
 	get_node("Menu/Join Menu").hide()
