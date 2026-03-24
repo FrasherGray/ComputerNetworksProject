@@ -1,10 +1,18 @@
 extends Node
-var UDPPacketHandler: PacketPeerUDP = PacketPeerUDP.new()
+
+const LOBBY_DATA_BROADCAST_PORT: int = 9821
+const LOBBY_DATA_RECEIVER_PORT: int = 9921
+const GAME_DATA_BROADCAST_PORT: int = 9822
+const GAME_DATA_RECEIVER_PORT: int = 9922
+var UDPPacketHandler: PacketPeerUDP
 @onready var timer_2: Timer = $Game/Ball/Timer2
 
 
 # Multiplayer functions
 func _process(delta: float) -> void:
+	if UDPPacketHandler == null:
+		return
+
 	while UDPPacketHandler.get_available_packet_count() > 0:
 		var packet = UDPPacketHandler.get_packet()
 		if UDPPacketHandler.get_packet_error() != 0:
@@ -18,6 +26,16 @@ func _process(delta: float) -> void:
 					get_node("Game/Left").global_position = Vector2(packet[1], packet[2])
 			1: # ball bounced
 				pass
+
+func host() -> void:
+	UDPPacketHandler = PacketPeerUDP.new()
+	UDPPacketHandler.set_broadcast_enabled(true)
+	UDPPacketHandler.set_dest_address("192.168.1.255", LOBBY_DATA_BROADCAST_PORT)
+
+	if UDPPacketHandler.bind(LOBBY_DATA_RECEIVER_PORT) == OK:
+		print("UDP bound successfully")
+	else:
+		print("UDP failed to bind to receiver port")
 
 # UI 
 func start_local_game() -> void:
