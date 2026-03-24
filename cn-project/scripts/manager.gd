@@ -44,8 +44,9 @@ func _process(delta: float) -> void:
 						get_node("Menu/Join Menu").show()
 				else:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())
-					var newLobbyRow: Label = Label.new()
+					var newLobbyRow: Button = Button.new()
 					newLobbyRow.set_text("Lobby Name: " + packetData["Name"] + "   IP: " + packetData["IP"])
+					newLobbyRow.connect("pressed", join_lobby.bind(packetData["IP"]))
 					get_node("Menu/Join Menu/Panel/ServerInfo").add_child(newLobbyRow)
 		match packet[0]:
 			0: # other player moved paddle
@@ -107,6 +108,9 @@ func browse_lobby_list() -> void:
 	get_node("Menu/Multiplayer").hide()
 	get_node("Menu/Join Menu").show()
 
+func join_lobby(ofIP: String) -> void:
+	
+
 func _on_sub_menu_join_back_pressed() -> void:
 	get_node("Menu/Join Menu").hide()
 	get_node("Menu/Main").show()
@@ -118,11 +122,14 @@ func _on_host_pressed() -> void:
 	get_node("Menu/Multiplayer").hide()
 	get_node("Menu/Host Menu").show()
 
+func create_host_lobby() -> void:
+	lobbyName = get_node("Menu/Host Menu/InputedName").get_text()
+	isHost = true
+
 func start_LAN_game():
 	get_node("Menu/Host Menu").hide()
 	get_node("Game").show()
 	timer_2.start()
-	
 
 func _on_back_menu_pressed() -> void:
 	get_node("Menu/Host Menu").hide()

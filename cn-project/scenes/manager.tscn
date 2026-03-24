@@ -401,6 +401,7 @@ text = "Quit to Desktop"
 [connection signal="draw" from="Game/left_lable" to="Game/Point Zone Right" method="_on_label_draw"]
 [connection signal="text_submitted" from="Menu/Host Menu/InputedName" to="Menu/Host Menu" method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="Menu/Host Menu/BackMenu" to="." method="_on_back_menu_pressed"]
+[connection signal="pressed" from="Menu/Host Menu/Host" to="." method="create_host_lobby"]
 [connection signal="timeout" from="Menu/Join Menu/Server Browser/Broadcast Timer" to="Menu/Join Menu/Server Browser" method="_on_broadcast_timer_timeout"]
 [connection signal="pressed" from="Menu/Join Menu/subMenuJoinBack" to="." method="_on_sub_menu_join_back_pressed"]
 [connection signal="pressed" from="Menu/Multiplayer/Host" to="." method="_on_host_pressed"]
