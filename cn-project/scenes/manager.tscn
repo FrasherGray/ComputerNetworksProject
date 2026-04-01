@@ -404,6 +404,7 @@ text = "Quit to Desktop"
 [connection signal="pressed" from="Menu/Host Menu/Host" to="." method="create_host_lobby"]
 [connection signal="timeout" from="Menu/Join Menu/Server Browser/Broadcast Timer" to="Menu/Join Menu/Server Browser" method="_on_broadcast_timer_timeout"]
 [connection signal="pressed" from="Menu/Join Menu/subMenuJoinBack" to="." method="_on_sub_menu_join_back_pressed"]
+[connection signal="pressed" from="Menu/Join Menu/RefreshList" to="." method="requestLobbyData"]
 [connection signal="pressed" from="Menu/Multiplayer/Host" to="." method="_on_host_pressed"]
 [connection signal="pressed" from="Menu/Multiplayer/Join" to="." method="browse_lobby_list"]
 [connection signal="pressed" from="Menu/Main/Local" to="." method="start_local_game"]

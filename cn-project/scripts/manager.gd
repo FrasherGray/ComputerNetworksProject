@@ -27,6 +27,7 @@ var UDPPackedReceiver: PacketPeerUDP = PacketPeerUDP.new()
 
 # Multiplayer functions
 func _ready() -> void:
+	print(IP.get_local_interfaces())
 	if OS.has_feature("windows"):
 		IPAddress = IP.get_local_addresses()[5]
 	else:
@@ -78,9 +79,12 @@ func setupHost() -> bool:
 		return false
 
 func setupClient() -> bool:
+	var decimal: int = IPAddress.find(".")
+	var widerIP: String = IPAddress.left(IPAddress.find(".", decimal + 1)) + ".255.255"
+	
 	UDPPacketBroadcaster = PacketPeerUDP.new()
 	UDPPacketBroadcaster.set_broadcast_enabled(true)
-	UDPPacketBroadcaster.set_dest_address("192.168.1.255", LOBBY_RECEIVER_PORT)
+	UDPPacketBroadcaster.set_dest_address(widerIP, LOBBY_RECEIVER_PORT)
 	
 	if UDPPacketBroadcaster.bind(LOBBY_BROADCAST_PORT) == OK:
 		print("UDP bound successfully")
@@ -90,6 +94,7 @@ func setupClient() -> bool:
 		return false
 
 func sendHostData(toIP: String) -> void:
+	print("sending host data")
 	if not isHost or UDPPacketBroadcaster == null:
 		return
 	UDPPacketBroadcaster.set_dest_address(toIP, LOBBY_RECEIVER_PORT)
@@ -97,6 +102,7 @@ func sendHostData(toIP: String) -> void:
 	UDPPacketBroadcaster.put_packet(roomData.to_ascii_buffer())
 
 func requestLobbyData() -> void:
+	print("Requesting lobby data")
 	for child in get_node("Menu/Join Menu/Panel/ServerInfo").get_children():
 		child.queue_free()
 	UDPPacketBroadcaster.put_packet(PackedByteArray([1]))
