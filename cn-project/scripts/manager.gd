@@ -27,7 +27,6 @@ var UDPPackedReceiver: PacketPeerUDP = PacketPeerUDP.new()
 
 # Multiplayer functions
 func _ready() -> void:
-	print(IP.get_local_interfaces())
 	if OS.has_feature("windows"):
 		IPAddress = IP.get_local_addresses()[5]
 	else:
@@ -73,14 +72,17 @@ func setupHost() -> bool:
 
 	if UDPPacketBroadcaster.bind(LOBBY_BROADCAST_PORT) == OK:
 		print("UDP bound successfully")
-		return true
+		#return true
 	else:
 		print("UDP failed to bind to receiver port")
-		return false
+		#return false
+	UDPPacketBroadcaster.set_dest_address(IPAddress, LOBBY_RECEIVER_PORT)
+	UDPPacketBroadcaster.put_packet([2, 4])
+	return true
 
 func setupClient() -> bool:
-	var decimal: int = IPAddress.find(".")
-	var widerIP: String = IPAddress.left(IPAddress.find(".", decimal + 1)) + ".255.255"
+	var decimal: int = IPAddress.rfind(".")
+	var widerIP: String = IPAddress.left(decimal) + ".255"
 	
 	UDPPacketBroadcaster = PacketPeerUDP.new()
 	UDPPacketBroadcaster.set_broadcast_enabled(true)
