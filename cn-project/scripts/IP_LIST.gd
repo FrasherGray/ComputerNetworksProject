@@ -21,7 +21,7 @@ func on_vis_changed():
 	print("Menu visible:", join_menu.visible)
 	
 	create_headers()
-	add_row("Calen", 1234, 2)
+	#add_row("Calen", 1234, 2)
 
 
 func create_headers():

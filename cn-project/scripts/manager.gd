@@ -15,6 +15,7 @@ var inLobby: bool = false
 var hostIP: String = ""
 
 # General Multiplayer Variables
+var IPAddress: String
 var lobbyName: String = ""
 var inMenu: bool = false
 
@@ -26,6 +27,10 @@ var UDPPackedReceiver: PacketPeerUDP = PacketPeerUDP.new()
 
 # Multiplayer functions
 func _ready() -> void:
+	if OS.has_feature("windows"):
+		IPAddress = IP.get_local_addresses()[5]
+	else:
+		IPAddress = IP.get_local_addresses()[0]
 	if UDPPackedReceiver.bind(LOBBY_RECEIVER_PORT) == OK:
 		print("Receiver successfully set up")
 	else:
@@ -37,6 +42,7 @@ func _process(_delta: float) -> void:
 
 	while UDPPackedReceiver.get_available_packet_count() > 0:
 		var packet = UDPPackedReceiver.get_packet()
+		print(packet)
 		if UDPPackedReceiver.get_packet_error() != 0:
 			#discard packet, it's bad/wrong
 			continue
@@ -87,7 +93,7 @@ func sendHostData(toIP: String) -> void:
 	if not isHost or UDPPacketBroadcaster == null:
 		return
 	UDPPacketBroadcaster.set_dest_address(toIP, LOBBY_RECEIVER_PORT)
-	var roomData: String = JSON.stringify({ "Name": lobbyName, "IP": IP.get_local_addresses()[0] })
+	var roomData: String = JSON.stringify({ "Name": lobbyName, "IP": IPAddress })
 	UDPPacketBroadcaster.put_packet(roomData.to_ascii_buffer())
 
 func requestLobbyData() -> void:
