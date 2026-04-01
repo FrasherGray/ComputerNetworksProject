@@ -20,7 +20,7 @@ var inMenu: bool = false
 
 # Musc Var Declarations
 var UDPPacketBroadcaster: PacketPeerUDP
-var UDPPackedReceiver: PacketPeerUDP
+var UDPPackedReceiver: PacketPeerUDP = PacketPeerUDP.new()
 @onready var timer_2: Timer = $Game/Ball/Timer2
 
 
@@ -76,7 +76,7 @@ func setupClient() -> bool:
 	UDPPacketBroadcaster.set_broadcast_enabled(true)
 	UDPPacketBroadcaster.set_dest_address("192.168.1.255", LOBBY_RECEIVER_PORT)
 	
-	if UDPPacketBroadcaster.bind(LOBBY_BROADCAST_PORT + 1) == OK:
+	if UDPPacketBroadcaster.bind(LOBBY_BROADCAST_PORT) == OK:
 		print("UDP bound successfully")
 		return true
 	else:
