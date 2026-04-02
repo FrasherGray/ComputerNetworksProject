@@ -47,7 +47,7 @@ func _process(delta: float) -> void:
 		while listen_udp.get_available_packet_count() > 0:
 			var msg = listen_udp.get_packet().get_string_from_utf8()
 			ip_client = listen_udp.get_packet_ip()
-			is_hosting = false
+			#is_hosting = false
 			#listen_udp.close()
 			print("Connecting:" ,ip_client)
 			return
@@ -78,7 +78,7 @@ func setup_server():
 
 	udp.bind(0)
 	udp.set_broadcast_enabled(true)
-	udp.set_dest_address("255.255.255.255", 9999)
+	udp.set_dest_address("172.20.6.255", 9999)
 
 func on_connection():
 	connection.text = "Connection Successfull!"

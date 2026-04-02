@@ -1,5 +1,6 @@
 extends Control
 @onready var panel: Panel = $"../Panel"
+@onready var host_menu: Control = $"../../Host Menu"
 
 # var tcp := StreamPeerTCP.new()
 var packet := PacketPeerStream.new()
@@ -14,34 +15,35 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	#if tcp.get_available_bytes() > 0:
 	#	pass
-	while udp.get_available_packet_count() > 0:
-		var packet = udp.get_packet()
-		if packet.size() == 0:
-			continue
+	if not host_menu.is_hosting:
+		while udp.get_available_packet_count() > 0:
+			var packet = udp.get_packet()
+			if packet.size() == 0:
+				continue
 		
-		var msg = packet.get_string_from_utf8()
-		var ip = udp.get_packet_ip()
-		var port = udp.get_packet_port()
+			var msg = packet.get_string_from_utf8()
+			var ip = udp.get_packet_ip()
+			var port = udp.get_packet_port()
 		
-		var data = JSON.parse_string(msg)
+			var data = JSON.parse_string(msg)
 		
-		if typeof(data) != TYPE_DICTIONARY:
-			print("Invalid JSON from: ", ip)
-			continue
+			if typeof(data) != TYPE_DICTIONARY:
+				print("Invalid JSON from: ", ip)
+				continue
 		
-		if not data.has("id") or data["id"] != "MY_GAME":
-			continue
+			if not data.has("id") or data["id"] != "MY_GAME":
+				continue
 			
-		if not data.has("name") or not data.has("port"):
-			print("Missing fields from:", ip)
-			continue
+			if not data.has("name") or not data.has("port"):
+				print("Missing fields from:", ip)
+				continue
 		
-		var key = ip + ":" + str(port) + data.name
+			var key = ip + ":" + str(port) + data.name
 		
-		if not ip_old.has(key):
-			print("Found sever at:",data.name, ip, data.port)
-			panel.add_row(data.name,ip,data.port)
-			ip_old[key] = true
+			if not ip_old.has(key):
+				print("Found sever at:",data.name, ip, data.port)
+				panel.add_row(data.name,ip,data.port)
+				ip_old[key] = true
 
 func connect_to_server(ip: String, port: int):
 	udp.set_dest_address(ip,port)
