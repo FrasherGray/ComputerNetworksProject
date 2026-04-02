@@ -2,12 +2,15 @@ extends Panel
 @onready var join_menu: Control = $".."
 @onready var server_info: VBoxContainer = $ServerInfo
 @onready var server_browser: Control = $"../Server Browser"
+@onready var host_menu: Control = $"../../Host Menu"
 
 var Headers_IP_INFO = ["Name","IP Address", "Port", "Join"]
 var IP_INFO = []
 var header_info = false
 var ip_host
 var port_host 
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	join_menu.visibility_changed.connect(on_vis_changed)
@@ -18,6 +21,8 @@ func _process(delta: float) -> void:
 	pass
 
 func on_vis_changed():
+	host_menu.udp.set_broadcast_enabled(false)
+	host_menu.is_hosting = false
 	if not join_menu.visible:
 		return
 		
