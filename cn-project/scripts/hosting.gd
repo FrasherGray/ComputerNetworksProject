@@ -19,7 +19,8 @@ enum NetState{
 var state = NetState.DISCOVERY
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-		server.listen(3000)
+	print(IP.get_local_addresses())
+	server.listen(3000)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

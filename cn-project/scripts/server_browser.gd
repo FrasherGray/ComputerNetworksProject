@@ -14,15 +14,27 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	#if tcp.get_available_bytes() > 0:
 	#	pass
-	if udp.get_available_packet_count() > 0:
-		var msg = udp.get_packet().get_string_from_utf8()
+	while udp.get_available_packet_count() > 0:
+		var packet = udp.get_packet()
+		var msg = packet.get_string_from_utf8()
 		var ip = udp.get_packet_ip()
-		var data = JSON.parse_string(msg)
+		var port = udp.get_packet_port()
 		
-		if not ip_old.has(ip):
+		var data = JSON.parse_string(msg)
+		if typeof(data) != TYPE_DICTIONARY:
+			print("Invalid JSON from: ", ip)
+			continue
+		
+		if not data.has("name") or not data.has("port"):
+			print("Missing fields from:", ip)
+			continue
+		
+		var key = ip + ":" + str(port) + data.name
+		
+		if not ip_old.has(key):
 			print("Found sever at:",data.name, ip, data.port)
 			panel.add_row(data.name,ip,data.port)
-			ip_old[ip] = true
+			ip_old[key] = true
 
 func connect_to_server(ip: String, port: int):
 	udp.set_dest_address(ip,port)
