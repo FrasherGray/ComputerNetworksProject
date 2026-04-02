@@ -16,15 +16,22 @@ func _process(delta: float) -> void:
 	#	pass
 	while udp.get_available_packet_count() > 0:
 		var packet = udp.get_packet()
+		if packet.size() == 0:
+			continue
+		
 		var msg = packet.get_string_from_utf8()
 		var ip = udp.get_packet_ip()
 		var port = udp.get_packet_port()
 		
 		var data = JSON.parse_string(msg)
+		
 		if typeof(data) != TYPE_DICTIONARY:
 			print("Invalid JSON from: ", ip)
 			continue
 		
+		if not data.has("id") or data["id"] != "MY_GAME":
+			continue
+			
 		if not data.has("name") or not data.has("port"):
 			print("Missing fields from:", ip)
 			continue
@@ -41,7 +48,7 @@ func connect_to_server(ip: String, port: int):
 	var message = {
 		"type": "join"
 	}
-	
+	print("Joining Server", ip, port)
 	udp.put_packet(JSON.stringify(message).to_utf8_buffer())
 	
 	#tcp.connect_to_host(ip,port)

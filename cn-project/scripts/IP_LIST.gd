@@ -9,7 +9,7 @@ var IP_INFO = []
 var header_info = false
 var ip_host
 var port_host 
-
+var vis = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -21,8 +21,11 @@ func _process(delta: float) -> void:
 	pass
 
 func on_vis_changed():
-	host_menu.udp.set_broadcast_enabled(false)
-	host_menu.is_hosting = false
+	vis = !vis
+	if vis == true:
+		host_menu.udp.set_broadcast_enabled(false)
+		host_menu.is_hosting = false
+	
 	if not join_menu.visible:
 		return
 		

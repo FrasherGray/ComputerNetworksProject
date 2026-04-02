@@ -11,32 +11,44 @@ var user_input: String
 var udp := PacketPeerUDP.new()
 var is_hosting = false
 var ip_client
+
+var listen_udp = PacketPeerUDP.new()
+
 enum NetState{
 	DISCOVERY,
 	CONNECTING,
 	CONNECTED
 }
+
 var state = NetState.DISCOVERY
+
+
+var timer = 0.0
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	print(IP.get_local_addresses())
-	server.listen(3000)
+	listen_udp.bind(3000)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	var server_info = {
+		"id": "MY_GAME",
 		"name": user_input,
 		"port": 3000
 	}
 	
 	if is_hosting:
+		#timer += delta
+		#if timer > .5:
+			#timer = 0
 		udp.put_packet(JSON.stringify(server_info).to_utf8_buffer())
-		if udp.get_available_packet_count() > 0:
-			var msg = udp.get_packet().get_string_from_utf8()
-			ip_client = udp.get_packet_ip()
+		while listen_udp.get_available_packet_count() > 0:
+			var msg = listen_udp.get_packet().get_string_from_utf8()
+			ip_client = listen_udp.get_packet_ip()
 			is_hosting = false
-			udp.close()
+			#listen_udp.close()
 			print("Connecting:" ,ip_client)
 			return
 	if NetState.CONNECTED:
@@ -56,11 +68,15 @@ func _process(delta: float) -> void:
 func _on_line_edit_text_submitted(new_text: String) -> void:
 	user_input = inputed_name.text
 	print("User entered: " + user_input)
-	is_hosting = true
 	setup_server()
+	is_hosting = true
 	
 
 func setup_server():
+	if udp.is_bound():
+		udp.close()
+
+	udp.bind(0)
 	udp.set_broadcast_enabled(true)
 	udp.set_dest_address("255.255.255.255", 9999)
 
