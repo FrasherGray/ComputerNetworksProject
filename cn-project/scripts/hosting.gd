@@ -4,15 +4,15 @@ extends Control
 @onready var connection: Label = $Connection
 @onready var manager: Node = $"../.."
 
-var server := TCPServer.new()
-var clients = []
+#var server := TCPServer.new()
+#var clients = []
 
 var user_input: String
 var udp := PacketPeerUDP.new()
-var is_hosting = false
+var is_hosting
 var ip_client
 
-var listen_udp = PacketPeerUDP.new()
+#var listen_udp = PacketPeerUDP.new()
 
 enum NetState{
 	DISCOVERY,
@@ -28,7 +28,7 @@ var timer = 0.0
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	print(IP.get_local_addresses())
-	listen_udp.bind(3000)
+	#listen_udp.bind(3000)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -44,26 +44,25 @@ func _process(delta: float) -> void:
 		#if timer > .5:
 			#timer = 0
 		udp.put_packet(JSON.stringify(server_info).to_utf8_buffer())
-		while listen_udp.get_available_packet_count() > 0:
-			var msg = listen_udp.get_packet().get_string_from_utf8()
-			ip_client = listen_udp.get_packet_ip()
+		while udp.get_available_packet_count() > 0: #listen_udp
+			##ip_client = listen_udp.get_packet_ip()
 			#is_hosting = false
 			#listen_udp.close()
-			print("Connecting:" ,ip_client)
+			#print("Connecting:" ,ip_client)
 			return
-	if NetState.CONNECTED:
-		if server.is_connection_available():
-			var client = server.take_connection()
-			print("Client connected from: ", client.get_connected_host())
-			var packet = PacketPeerStream.new()
-			packet.stream_peer = client
+	#if NetState.CONNECTED:
+		#if server.is_connection_available():
+			#var client = server.take_connection()
+			#print("Client connected from: ", client.get_connected_host())
+			#var packet = PacketPeerStream.new()
+			#packet.stream_peer = client
 		
-			clients.append(packet)
+			#clients.append(packet)
 		
-		for packet in clients:
-			if packet.get_available_packet_count > 0:
-				var data = packet.get_var()
-				print("Received: ", data)
+		#for packet in clients:
+			#if packet.get_available_packet_count > 0:
+				#var data = packet.get_var()
+				#print("Received: ", data)
 
 func _on_line_edit_text_submitted(new_text: String) -> void:
 	user_input = inputed_name.text
@@ -76,7 +75,7 @@ func setup_server():
 	if udp.is_bound():
 		udp.close()
 
-	udp.bind(0)
+	udp.bind(9999)
 	udp.set_broadcast_enabled(true)
 	udp.set_dest_address("172.20.255.255", 9999)
 

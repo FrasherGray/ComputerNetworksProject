@@ -15,6 +15,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	#if tcp.get_available_bytes() > 0:
 	#	pass
+	print(host_menu.is_hosting)
 	if not host_menu.is_hosting:
 		while udp.get_available_packet_count() > 0:
 			var packet = udp.get_packet()
