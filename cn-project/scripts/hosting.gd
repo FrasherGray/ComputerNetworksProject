@@ -78,7 +78,7 @@ func setup_server():
 
 	udp.bind(0)
 	udp.set_broadcast_enabled(true)
-	udp.set_dest_address("172.20.6.255", 9999)
+	udp.set_dest_address("172.20.255.255", 9999)
 
 func on_connection():
 	connection.text = "Connection Successfull!"
