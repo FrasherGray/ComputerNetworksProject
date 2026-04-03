@@ -17,9 +17,9 @@ var hostIP: String = ""
 # General Multiplayer Variables
 var IPAddress: String
 var lobbyName: String = ""
-var inMenu: bool = false
+var inMenu: bool = true
 
-# Musc Var Declarations
+# Misc Var Declarations
 var UDPPacketBroadcaster: PacketPeerUDP
 var UDPPackedReceiver: PacketPeerUDP = PacketPeerUDP.new()
 @onready var timer_2: Timer = $Game/Ball/Timer2
@@ -27,6 +27,7 @@ var UDPPackedReceiver: PacketPeerUDP = PacketPeerUDP.new()
 
 # Multiplayer functions
 func _ready() -> void:
+	print(IP.get_local_addresses())
 	if OS.has_feature("windows"):
 		IPAddress = IP.get_local_addresses()[5]
 	else:
@@ -46,6 +47,7 @@ func _process(_delta: float) -> void:
 		if UDPPackedReceiver.get_packet_error() != 0:
 			#discard packet, it's bad/wrong
 			continue
+		print(inMenu, ", ", isHost, ", ", inLobby)
 		if inMenu:
 			if isHost:
 				if packet[0] == 1:
@@ -55,7 +57,7 @@ func _process(_delta: float) -> void:
 					if packet[0] == 0: # host closed lobby
 						# close game ui menu, when made
 						get_node("Menu/Join Menu").show()
-				else:
+				elif packet.size() > 1:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())
 					get_node("Menu/Join Menu/Panel").add_row(packetData["Name"], packetData["IP"], 1)
 		match packet[0]:
@@ -72,21 +74,15 @@ func setupHost() -> bool:
 
 	if UDPPacketBroadcaster.bind(LOBBY_BROADCAST_PORT) == OK:
 		print("UDP bound successfully")
-		#return true
+		return true
 	else:
 		print("UDP failed to bind to receiver port")
-		#return false
-	UDPPacketBroadcaster.set_dest_address(IPAddress, LOBBY_RECEIVER_PORT)
-	UDPPacketBroadcaster.put_packet([2, 4])
-	return true
+		return false
 
 func setupClient() -> bool:
-	var decimal: int = IPAddress.rfind(".")
-	var widerIP: String = IPAddress.left(decimal) + ".255"
-	
 	UDPPacketBroadcaster = PacketPeerUDP.new()
 	UDPPacketBroadcaster.set_broadcast_enabled(true)
-	UDPPacketBroadcaster.set_dest_address(widerIP, LOBBY_RECEIVER_PORT)
+	UDPPacketBroadcaster.set_dest_address("255.255.255.255", LOBBY_RECEIVER_PORT)
 	
 	if UDPPacketBroadcaster.bind(LOBBY_BROADCAST_PORT) == OK:
 		print("UDP bound successfully")
@@ -99,9 +95,11 @@ func sendHostData(toIP: String) -> void:
 	print("sending host data")
 	if not isHost or UDPPacketBroadcaster == null:
 		return
+	print("to ", toIP)
 	UDPPacketBroadcaster.set_dest_address(toIP, LOBBY_RECEIVER_PORT)
 	var roomData: String = JSON.stringify({ "Name": lobbyName, "IP": IPAddress })
 	UDPPacketBroadcaster.put_packet(roomData.to_ascii_buffer())
+	
 
 func requestLobbyData() -> void:
 	print("Requesting lobby data")
