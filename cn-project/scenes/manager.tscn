@@ -182,11 +182,63 @@ offset_right = 40.0
 offset_bottom = 40.0
 theme = ExtResource("2_bgrh2")
 
+[node name="Lobby Menu" type="Control" parent="Menu" unique_id=1483886732]
+visible = false
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="Name" type="Label" parent="Menu/Lobby Menu" unique_id=1311934125]
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 50
+text = "Lobby Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player1" type="Label" parent="Menu/Lobby Menu" unique_id=2129293611]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 230.0
+offset_right = 393.0
+offset_bottom = 270.0
+text = "Host"
+vertical_alignment = 1
+
+[node name="Player2" type="Label" parent="Menu/Lobby Menu" unique_id=810927702]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 270.0
+offset_right = 393.0
+offset_bottom = 310.0
+text = "Empty"
+vertical_alignment = 1
+
+[node name="Start" type="Button" parent="Menu/Lobby Menu" unique_id=1259609234]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 525.0
+offset_right = 350.0
+offset_bottom = 585.0
+theme_override_font_sizes/font_size = 36
+disabled = true
+text = "Start Game"
+
+[node name="Leave" type="Button" parent="Menu/Lobby Menu" unique_id=190450698]
+layout_mode = 0
+offset_left = 802.0
+offset_top = 525.0
+offset_right = 1052.0
+offset_bottom = 585.0
+theme_override_font_sizes/font_size = 36
+text = "Leave Game"
+
 [node name="Host Menu" type="Control" parent="Menu" unique_id=676045541]
 visible = false
 anchors_preset = 0
-offset_right = 1157.0
-offset_bottom = 657.0
+offset_right = 1152.0
+offset_bottom = 648.0
 script = ExtResource("8_3ftge")
 
 [node name="Title" type="Label" parent="Menu/Host Menu" unique_id=1899627282]
@@ -241,8 +293,8 @@ text = "Host Lobby"
 [node name="Join Menu" type="Control" parent="Menu" unique_id=1956085511]
 visible = false
 anchors_preset = 0
-offset_right = 1151.0
-offset_bottom = 651.0
+offset_right = 1152.0
+offset_bottom = 648.0
 
 [node name="ColorRect" type="ColorRect" parent="Menu/Join Menu" unique_id=2096813385]
 custom_minimum_size = Vector2(100, 200)
@@ -392,6 +444,18 @@ offset_bottom = 36.0
 grow_horizontal = 0
 text = "Quit to Desktop"
 
+[node name="PlayerName" type="LineEdit" parent="Menu/Main" unique_id=1090127813]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -225.0
+offset_top = 125.0
+offset_right = 225.0
+offset_bottom = 165.0
+grow_horizontal = 2
+placeholder_text = "your online name"
+
 [connection signal="timeout" from="Game/Ball/Timer" to="Game/Ball" method="_on_timer_timeout"]
 [connection signal="timeout" from="Game/Ball/Timer2" to="Game/Ball" method="_on_timer_2_timeout"]
 [connection signal="body_entered" from="Game/Point Zone Left" to="Game/Point Zone Left" method="_on_body_entered"]
@@ -399,6 +463,8 @@ text = "Quit to Desktop"
 [connection signal="body_entered" from="Game/Point Zone Right" to="Game/Point Zone Right" method="_on_body_entered"]
 [connection signal="timeout" from="Game/Point Zone Right/Timer" to="Game/Point Zone Right" method="_on_timer_timeout"]
 [connection signal="draw" from="Game/left_lable" to="Game/Point Zone Right" method="_on_label_draw"]
+[connection signal="pressed" from="Menu/Lobby Menu/Start" to="." method="start_LAN_game"]
+[connection signal="pressed" from="Menu/Lobby Menu/Leave" to="." method="leave_lobby_menu"]
 [connection signal="text_submitted" from="Menu/Host Menu/InputedName" to="Menu/Host Menu" method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="Menu/Host Menu/BackMenu" to="." method="_on_back_menu_pressed"]
 [connection signal="pressed" from="Menu/Host Menu/Host" to="." method="create_host_lobby"]
@@ -409,3 +475,4 @@ text = "Quit to Desktop"
 [connection signal="pressed" from="Menu/Multiplayer/Join" to="." method="browse_lobby_list"]
 [connection signal="pressed" from="Menu/Main/Local" to="." method="start_local_game"]
 [connection signal="pressed" from="Menu/Main/Online" to="." method="view_multiplayer_menu"]
+[connection signal="text_changed" from="Menu/Main/PlayerName" to="." method="edit_player_name"]

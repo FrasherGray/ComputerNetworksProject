@@ -9,15 +9,18 @@ const GAME_RECEIVER_PORT: int = 9922
 # Host Variables
 var isHost: bool = false
 var clientIP: String = ""
+var lobbyFull: bool = false
 
 # Client Variables
 var inLobby: bool = false
 var hostIP: String = ""
 
 # General Multiplayer Variables
+var playerName: String = "John Doe"
 var IPAddress: String
 var lobbyName: String = ""
 var inMenu: bool = true
+var sentPositionTicker: int = 0
 
 # Misc Var Declarations
 var UDPPacketBroadcaster: PacketPeerUDP
@@ -27,7 +30,6 @@ var UDPPackedReceiver: PacketPeerUDP = PacketPeerUDP.new()
 
 # Multiplayer functions
 func _ready() -> void:
-	print(IP.get_local_addresses())
 	if OS.has_feature("windows"):
 		IPAddress = IP.get_local_addresses()[5]
 	else:
@@ -36,6 +38,14 @@ func _ready() -> void:
 		print("Receiver successfully set up")
 	else:
 		print("Receiver failed to bind to receiver port")
+	
+	if FileAccess.file_exists("user://settings"):
+		var playerSettings = FileAccess.open("user://settings", FileAccess.READ)
+		playerName = playerSettings.get_pascal_string()
+	else:
+		var playerSettings = FileAccess.open("user://settings", FileAccess.WRITE)
+		playerSettings.store_pascal_string(playerName)
+	get_node("Menu/Main/PlayerName").set_text(playerName)
 
 func _process(_delta: float) -> void:
 	if UDPPackedReceiver == null:
@@ -50,24 +60,72 @@ func _process(_delta: float) -> void:
 		print(inMenu, ", ", isHost, ", ", inLobby)
 		if inMenu:
 			if isHost:
-				if packet[0] == 1:
+				if packet[0] == 1 and not lobbyFull:
 					sendHostData(UDPPackedReceiver.get_packet_ip())
+				elif packet[0] == 2:
+					if lobbyFull:
+						UDPPacketBroadcaster.set_dest_address(UDPPackedReceiver.get_packet_ip(), LOBBY_RECEIVER_PORT)
+						UDPPacketBroadcaster.put_packet(PackedByteArray([0]))
+						UDPPacketBroadcaster.set_dest_address(clientIP, LOBBY_RECEIVER_PORT)
+					lobbyFull = true
+					get_node("Menu/Lobby Menu/Start").set_disabled(false)
+					get_node("Menu/Lobby Menu/Player2").set_text(packet.get_string_from_ascii().right(-1))
+					clientIP = UDPPackedReceiver.get_packet_ip()
+					
+					var namePacket: PackedByteArray = PackedByteArray([4])
+					namePacket.append_array(playerName.to_ascii_buffer())
+				elif packet[0] == 3:
+					client_started_LAN_game(packet.decode_float(1))
 			else:
 				if inLobby:
-					if packet[0] == 0: # host closed lobby
-						# close game ui menu, when made
+					if packet[0] == 0: # host closed lobby or rejected from lobby
+						inLobby = false
+						get_node("Menu/Lobby Menu").hide()
 						get_node("Menu/Join Menu").show()
+						requestLobbyData()
+					elif packet[0] == 3: # host starting game
+						var newPacket: PackedByteArray = PackedByteArray([3, 0, 0, 0, 0])
+						newPacket.encode_float(1, Time.get_unix_time_from_system())
+						UDPPacketBroadcaster.put_packet(newPacket)
+						get_node("Menu/Lobby Menu").hide()
+						get_node("Game").show()
+						get_node("Game/Left").locally_owned = false
+						get_node("Game/Right").locally_owned = true
+						timer_2.start()
+						inMenu = false
+						UDPPacketBroadcaster.set_dest_address(hostIP, GAME_RECEIVER_PORT)
+						UDPPackedReceiver.bind(GAME_RECEIVER_PORT)
+						UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
+					elif packet[0] == 4: # host sent you their name
+						var hostName: String = packet.get_string_from_ascii().right(-1)
+						get_node("Menu/Lobby Menu/Player1").set_text(hostName)
 				elif packet.size() > 1:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())
 					get_node("Menu/Join Menu/Panel").add_row(packetData["Name"], packetData["IP"], 1)
-		match packet[0]:
-			0: # other player moved paddle
-				if multiplayer.get_unique_id() == 1: # other player's paddle is the right one
-					get_node("Game/Right").global_position = Vector2(packet[1], packet[2])
-				else:
-					get_node("Game/Left").global_position = Vector2(packet[1], packet[2])
-			1: # ball bounced
-				pass
+		else:
+			match packet[0]:
+				0: # other player moved paddle
+					if isHost: # other player's paddle is the right one
+						get_node("Game/Right").global_position = Vector2(packet[1], packet[2])
+					else:
+						get_node("Game/Left").global_position = Vector2(packet[1], packet[2])
+				1: # ball bounced
+					pass
+
+func _physics_process(delta: float) -> void:
+	if inMenu:
+		return
+
+	if sentPositionTicker == 5:
+		var packet: PackedByteArray
+		if isHost:
+			packet = PackedByteArray([0, roundi(get_node("Game/Left").get_global_position().x), roundi(get_node("Game/Left").get_global_position().y)])
+		else:
+			packet = PackedByteArray([0, roundi(get_node("Game/Right").get_global_position().x), roundi(get_node("Game/Right").get_global_position().y)])
+		UDPPacketBroadcaster.put_packet(packet)
+		sentPositionTicker = 0
+	else:
+		sentPositionTicker += 1
 
 func setupHost() -> bool:
 	UDPPacketBroadcaster = PacketPeerUDP.new()
@@ -97,9 +155,8 @@ func sendHostData(toIP: String) -> void:
 		return
 	print("to ", toIP)
 	UDPPacketBroadcaster.set_dest_address(toIP, LOBBY_RECEIVER_PORT)
-	var roomData: String = JSON.stringify({ "Name": lobbyName, "IP": IPAddress })
+	var roomData: String = JSON.stringify({ "Lobby": lobbyName, "Player": playerName })
 	UDPPacketBroadcaster.put_packet(roomData.to_ascii_buffer())
-	
 
 func requestLobbyData() -> void:
 	print("Requesting lobby data")
@@ -108,9 +165,16 @@ func requestLobbyData() -> void:
 	UDPPacketBroadcaster.put_packet(PackedByteArray([1]))
 
 # UI 
+func edit_player_name(newName: String) -> void:
+	playerName = newName
+	var playerSettings = FileAccess.open("user://settings", FileAccess.WRITE)
+	playerSettings.store_pascal_string(playerName)
+
 func start_local_game() -> void:
 	get_node("Menu/Main").hide()
 	get_node("Game").show()
+	get_node("Game/Left").locally_owned = true
+	get_node("Game/Right").locally_owned = true
 	timer_2.start()
 
 func view_multiplayer_menu() -> void:
@@ -125,9 +189,20 @@ func browse_lobby_list() -> void:
 	get_node("Menu/Multiplayer").hide()
 	get_node("Menu/Join Menu").show()
 
-func join_lobby(ofIP: String) -> void:
+func join_lobby(lobbyData: Dictionary) -> void:
 	inLobby = true
 	get_node("Menu/Join Menu").hide()
+	
+	hostIP = lobbyData["IP Address"]
+	get_node("Menu/Lobby Menu/Name").set_text(lobbyData["Name"])
+	get_node("Menu/Lobby Menu/Player1").set_text(hostIP)
+	get_node("Menu/Lobby Menu/Player2").set_text(playerName)
+	UDPPacketBroadcaster.set_dest_address(hostIP, LOBBY_RECEIVER_PORT)
+	var joinRequestPacket: PackedByteArray = PackedByteArray([2])
+	joinRequestPacket.append_array(playerName.to_ascii_buffer())
+	UDPPacketBroadcaster.put_packet(joinRequestPacket)
+	
+	get_node("Menu/Lobby Menu").show()
 
 func _on_sub_menu_join_back_pressed() -> void:
 	get_node("Menu/Join Menu").hide()
@@ -143,12 +218,35 @@ func _on_host_pressed() -> void:
 func create_host_lobby() -> void:
 	lobbyName = get_node("Menu/Host Menu/InputedName").get_text()
 	isHost = true
+	get_node("Menu/Host Menu").hide()
+	get_node("Menu/Lobby Menu").show()
+	get_node("Menu/Lobby Menu/Player1").set_text(playerName)
+	get_node("Menu/Lobby Menu/Player2").set_text("Empty")
 
 func start_LAN_game():
-	get_node("Menu/Host Menu").hide()
+	get_node("Menu/Lobby Menu/Start").set_disabled(true)
+	UDPPacketBroadcaster.put_packet(PackedByteArray([3]))
+
+func client_started_LAN_game(timeSinceConfirm: float) -> void:
+	get_node("Menu/Lobby Menu").hide()
 	get_node("Game").show()
+	get_node("Game/Left").locally_owned = true
+	get_node("Game/Right").locally_owned = false
+	timer_2.set_wait_time(3 - (Time.get_unix_time_from_system() - timeSinceConfirm))
 	timer_2.start()
+	inMenu = false
+	UDPPacketBroadcaster.set_dest_address(clientIP, GAME_RECEIVER_PORT)
+	UDPPackedReceiver.bind(GAME_RECEIVER_PORT)
+	UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
 
 func _on_back_menu_pressed() -> void:
 	get_node("Menu/Host Menu").hide()
 	get_node("Menu/Main").show()
+
+func leave_lobby_menu() -> void:
+	get_node("Menu/Lobby Menu/Start").set_disabled(true)
+	get_node("Menu/Lobby Menu").hide()
+	get_node("Menu/Main").show()
+	if lobbyFull:
+		UDPPacketBroadcaster.put_packet(PackedByteArray([0]))
+	isHost = false

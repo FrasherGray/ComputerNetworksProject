@@ -3,12 +3,14 @@ class_name Paddle
 
 const SPEED: int = 300
 
+var locally_owned: bool = false
+
 # default values; ideally should not be relied upon
 var upInput: String = "w"
 var downInput: String = "s"
 
 func _physics_process(delta: float) -> void:
-	if not is_multiplayer_authority():
+	if not locally_owned:
 		return
 
 	if Input.is_action_pressed(upInput) and global_position.y > 0:

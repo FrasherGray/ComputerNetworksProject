@@ -48,7 +48,7 @@ func create_row(row):
 			var join_button = Button.new()
 			join_button.text = "Join"
 			#connect IP signature to button press
-			join_button.pressed.connect(_on_join_pressed.bind(row))
+			join_button.pressed.connect(join_menu.get_parent().get_parent().join_lobby.bind(row))
 			column.add_child(join_button)
 		else:
 			var label = Label.new()
