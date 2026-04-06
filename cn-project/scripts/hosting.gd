@@ -9,7 +9,7 @@ extends Control
 
 var user_input: String
 var udp := PacketPeerUDP.new()
-var is_hosting
+var is_hosting = false
 var ip_client
 
 #var listen_udp = PacketPeerUDP.new()
@@ -49,6 +49,7 @@ func _process(delta: float) -> void:
 			#is_hosting = false
 			#listen_udp.close()
 			#print("Connecting:" ,ip_client)
+			print("GOT OWN packet")
 			return
 	#if NetState.CONNECTED:
 		#if server.is_connection_available():
@@ -77,7 +78,7 @@ func setup_server():
 
 	udp.bind(9999)
 	udp.set_broadcast_enabled(true)
-	udp.set_dest_address("172.20.255.255", 9999)
+	udp.set_dest_address("172.20.255.255", 9998)
 
 func on_connection():
 	connection.text = "Connection Successfull!"

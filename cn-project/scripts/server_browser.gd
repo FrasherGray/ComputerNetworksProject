@@ -9,13 +9,12 @@ var udp := PacketPeerUDP.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	udp.bind(9999)
+	udp.bind(9998)
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	#if tcp.get_available_bytes() > 0:
 	#	pass
-	print(host_menu.is_hosting)
 	if not host_menu.is_hosting:
 		while udp.get_available_packet_count() > 0:
 			var packet = udp.get_packet()
