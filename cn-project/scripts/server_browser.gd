@@ -31,20 +31,23 @@ func _process(delta: float) -> void:
 				print("Invalid JSON from: ", ip)
 				continue
 		
-			if not data.has("id") or data["id"] != "MY_GAME":
-				continue
+			#if not data.has("id") or data["id"] != "MY_GAME":
+			#	continue
 			
 			if not data.has("name") or not data.has("port"):
 				print("Missing fields from:", ip)
 				continue
-		
-			var key = ip + ":" + str(port) + data.name
-		
-			if not ip_old.has(key):
+				
+			var key = ip
+			
+			if panel.vis == true:
+				if (ip_old.has(key)):
+					continue
+					
+				ip_old[key] = true
 				print("Found sever at:",data.name, ip, data.port)
 				panel.add_row(data.name,ip,data.port)
-				ip_old[key] = true
-
+				
 func connect_to_server(ip: String, port: int):
 	udp.set_dest_address(ip,port)
 	var message = {
