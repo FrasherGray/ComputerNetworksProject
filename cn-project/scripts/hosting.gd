@@ -83,7 +83,7 @@ func _process(delta: float) -> void:
 			
 	if state == 2:
 		for peer in clients:
-			if peer.get_avaible_bytes() > 0:
+			if peer.get_available_bytes() > 0:
 				var data = peer.get_utf8_string(peer.get_available_bytes())
 				print("Recived: ", data)
 				

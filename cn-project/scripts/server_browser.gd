@@ -10,6 +10,13 @@ var packet := PacketPeerStream.new()
 var ip_old = {} 
 var udp := PacketPeerUDP.new()
 
+enum Status{
+	DISCOVERY,
+	CONNECTING,
+	CONNECTED
+}
+var state = Status.DISCOVERY
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	udp.bind(9998,"0.0.0.0")
@@ -18,7 +25,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	#if tcp.get_available_bytes() > 0:
 	#	pass
-	if not host_menu.is_hosting and conFlag == false:
+	if not host_menu.is_hosting and state == 0:
 		while udp.get_available_packet_count() > 0:
 			var packet = udp.get_packet()
 			if packet.size() == 0:
@@ -51,7 +58,7 @@ func _process(delta: float) -> void:
 				print("Found sever at:",data.name, ip, data.port)
 				panel.add_row(data.name,ip,data.port)
 				
-	if conFlag == true:
+	if state == 1:
 		if client.get_status() == StreamPeerTCP.STATUS_CONNECTED:
 			client.put_data("movment info".to_utf8_buffer())
 		
@@ -59,6 +66,8 @@ func _process(delta: float) -> void:
 			var data = client.get_utf8_string(client.get_available_bytes())
 			print("Host: ", data)
 	
+	if state == 2:
+		pass
 func connect_to_server(ip: String, port: int):
 	
 	udp.set_broadcast_enabled(true)
@@ -71,10 +80,10 @@ func connect_to_server(ip: String, port: int):
 	
 	udp.close()
 	
-	var err = client.connnect_to_host(ip, port)
+	var err = client.connect_to_host(ip, port)
 	if err != OK:
 		print("Connection Failed")
-	conFlag = true
+	state = 1
 
 func send_message(msg: String):
 	pass
