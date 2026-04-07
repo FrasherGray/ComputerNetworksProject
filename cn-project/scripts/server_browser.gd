@@ -2,20 +2,23 @@ extends Control
 @onready var panel: Panel = $"../Panel"
 @onready var host_menu: Control = $"../../Host Menu"
 
-# var tcp := StreamPeerTCP.new()
+var client = StreamPeerTCP.new()
+
+var conFlag = false
+
 var packet := PacketPeerStream.new()
 var ip_old = {} 
 var udp := PacketPeerUDP.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	udp.bind(9998)
+	udp.bind(9998,"0.0.0.0")
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	#if tcp.get_available_bytes() > 0:
 	#	pass
-	if not host_menu.is_hosting:
+	if not host_menu.is_hosting and conFlag == false:
 		while udp.get_available_packet_count() > 0:
 			var packet = udp.get_packet()
 			if packet.size() == 0:
@@ -31,8 +34,8 @@ func _process(delta: float) -> void:
 				print("Invalid JSON from: ", ip)
 				continue
 		
-			#if not data.has("id") or data["id"] != "MY_GAME":
-			#	continue
+			if not data.has("id") or data["id"] != "MY_GAME":
+				continue
 			
 			if not data.has("name") or not data.has("port"):
 				print("Missing fields from:", ip)
@@ -48,16 +51,30 @@ func _process(delta: float) -> void:
 				print("Found sever at:",data.name, ip, data.port)
 				panel.add_row(data.name,ip,data.port)
 				
+	if conFlag == true:
+		if client.get_status() == StreamPeerTCP.STATUS_CONNECTED:
+			client.put_data("movment info".to_utf8_buffer())
+		
+		if client.get_available_bytes() > 0:
+			var data = client.get_utf8_string(client.get_available_bytes())
+			print("Host: ", data)
+	
 func connect_to_server(ip: String, port: int):
-	udp.set_dest_address(ip,port)
+	
+	udp.set_broadcast_enabled(true)
+	udp.set_dest_address(ip,9999)
 	var message = {
-		"type": "join"
+		"type": "CLIENT"
 	}
 	print("Joining Server", ip, port)
 	udp.put_packet(JSON.stringify(message).to_utf8_buffer())
 	
-	#tcp.connect_to_host(ip,port)
-	#packet.stream_peer = tcp
+	udp.close()
+	
+	var err = client.connnect_to_host(ip, port)
+	if err != OK:
+		print("Connection Failed")
+	conFlag = true
 
 func send_message(msg: String):
 	pass
