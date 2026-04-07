@@ -59,13 +59,16 @@ func _process(delta: float) -> void:
 				panel.add_row(data.name,ip,data.port)
 				
 	if state == 1:
-		if client.get_status() == StreamPeerTCP.STATUS_CONNECTED:
-			client.put_data("movment info".to_utf8_buffer())
-		
-		if client.get_available_bytes() > 0:
-			var data = client.get_utf8_string(client.get_available_bytes())
-			print("Host: ", data)
-	
+		match client.get_status():
+			StreamPeerTCP.STATUS_CONNECTING:
+				pass
+			StreamPeerTCP.STATUS_CONNECTED:
+				client.put_data("Connecting".to_utf8_buffer())
+				if client.get_available_bytes() > 0:
+					var data = client.get_utf8_string(client.get_available_bytes())
+					print("Host: ", data)
+			StreamPeerTCP.STATUS_ERROR:
+				print("Connection Failed")
 	if state == 2:
 		pass
 func connect_to_server(ip: String, port: int):
