@@ -110,7 +110,10 @@ func _process(_delta: float) -> void:
 					else:
 						get_node("Game/Left").global_position = Vector2(packet[1], packet[2])
 				1: # ball bounced
-					pass
+					var newVelocity: Vector2 = Vector2(packet[1] + packet[2], packet[3] + packet[4])
+					var synchronizedPosition: Vector2 = Vector2(packet[5], packet[6])
+					get_node("Game/Ball").velocity = newVelocity
+					get_node("Game/Ball").set_global_position(synchronizedPosition)
 
 func _physics_process(delta: float) -> void:
 	if inMenu:
@@ -126,6 +129,19 @@ func _physics_process(delta: float) -> void:
 		sentPositionTicker = 0
 	else:
 		sentPositionTicker += 1
+
+func ballBounced(newVelocity: Vector2i) -> void:
+	var velocityPacket: PackedByteArray = PackedByteArray([1])
+	if newVelocity.x > 255:
+		velocityPacket.append_array([newVelocity.x - 255, 255])
+	else:
+		velocityPacket.append_array([0, newVelocity.x])
+	if newVelocity.y > 255:
+		velocityPacket.append_array([newVelocity.y - 255, 255])
+	else:
+		velocityPacket.append_array([0, newVelocity.y])
+	velocityPacket.append_array([get_node("Game/Ball").get_global_position().x, get_node("Game/Ball").get_global_position().y])
+	UDPPacketBroadcaster.put_packet(velocityPacket)
 
 func setupHost() -> bool:
 	UDPPacketBroadcaster = PacketPeerUDP.new()
