@@ -114,9 +114,9 @@ func _process(_delta: float) -> void:
 			match packet[0]:
 				0: # other player moved paddle
 					if isHost: # other player's paddle is the right one
-						get_node("Game/Right").global_position = Vector2(packet[1], packet[2])
+						get_node("Game/Right").set_global_position(Vector2(packet[1], packet[2]))
 					else:
-						get_node("Game/Left").global_position = Vector2(packet[1], packet[2])
+						get_node("Game/Left").set_global_position(Vector2(packet[1], packet[2]))
 				1: # ball bounced
 					var newVelocity: Vector2 = Vector2(packet[1] + packet[2], packet[3] + packet[4])
 					var synchronizedPosition: Vector2 = Vector2(packet[5], packet[6])
@@ -127,7 +127,7 @@ func _physics_process(delta: float) -> void:
 	if inMenu:
 		return
 
-	if sentPositionTicker == 5:
+	if sentPositionTicker == 8:
 		var packet: PackedByteArray
 		if isHost:
 			packet = PackedByteArray([0, roundi(get_node("Game/Left").get_global_position().x), roundi(get_node("Game/Left").get_global_position().y)])
@@ -246,6 +246,7 @@ func create_host_lobby() -> void:
 	isHost = true
 	get_node("Menu/Host Menu").hide()
 	get_node("Menu/Lobby Menu").show()
+	get_node("Menu/Lobby Menu/Name").set_text(lobbyName)
 	get_node("Menu/Lobby Menu/Player1").set_text(playerName)
 	get_node("Menu/Lobby Menu/Player2").set_text("Empty")
 
@@ -277,4 +278,5 @@ func leave_lobby_menu() -> void:
 	get_node("Menu/Main").show()
 	if lobbyFull:
 		UDPPacketBroadcaster.put_packet(PackedByteArray([0]))
+		lobbyFull = false
 	isHost = false

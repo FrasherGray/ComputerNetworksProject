@@ -25,6 +25,7 @@ func addMessage(text: String, sender: String) -> void:
 func sendMessage(text: String) -> void:
 	var message: PackedByteArray = PackedByteArray([5])
 	message.append_array(text.to_ascii_buffer())
+	print(manager.UDPPacketBroadcaster.is_socket_connected())
 	if manager.UDPPacketBroadcaster.is_socket_connected():
 		manager.UDPPacketBroadcaster.put_packet(message)
 	get_node("Text").set_text("")
