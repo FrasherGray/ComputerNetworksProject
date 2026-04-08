@@ -61,7 +61,8 @@ func _process(delta: float) -> void:
 	if state == 1:
 		match client.get_status():
 			StreamPeerTCP.STATUS_CONNECTING:
-				pass
+				
+				print("Connecting")
 			StreamPeerTCP.STATUS_CONNECTED:
 				client.put_data("Connecting".to_utf8_buffer())
 				if client.get_available_bytes() > 0:

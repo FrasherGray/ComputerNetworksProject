@@ -5,6 +5,8 @@ extends Control
 @onready var manager: Node = $"../.."
 
 var server := TCPServer.new()
+var port = 3000
+
 var clients = []
 
 var user_input: String
@@ -22,14 +24,17 @@ enum NetState{
 
 var state = NetState.DISCOVERY
 
-
 var timer = 0.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	print(IP.get_local_addresses())
 	listen_udp.bind(9999)
-
+	
+	var err = server.listen(3000, "0.0.0.0")
+	if err != OK:
+		print("Server Failed")
+		return
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -64,10 +69,7 @@ func _process(delta: float) -> void:
 			listen_udp.close()
 			udp.close()
 			
-			var err = server.listen(3000, "0.0.0.0")
-			if err != OK:
-				print("Server Failed")
-				return
+			
 			print("TCP Starting")
 		
 			state = NetState.CONNECTING
