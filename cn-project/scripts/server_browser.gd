@@ -3,7 +3,7 @@ extends Control
 @onready var host_menu: Control = $"../../Host Menu"
 
 var client = StreamPeerTCP.new()
-
+var clock = 0
 var conFlag = false
 
 var packet := PacketPeerStream.new()
@@ -23,6 +23,7 @@ func _ready() -> void:
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	clock = delta
 	#if tcp.get_available_bytes() > 0:
 	#	pass
 	if not host_menu.is_hosting and state == 0:
@@ -59,12 +60,15 @@ func _process(delta: float) -> void:
 				panel.add_row(data.name,ip,data.port)
 				
 	if state == 1:
+		if client: 
+			client.poll()
+		
 		match client.get_status():
 			StreamPeerTCP.STATUS_CONNECTING:
 				
 				print("Connecting")
 			StreamPeerTCP.STATUS_CONNECTED:
-				client.put_data("Connecting".to_utf8_buffer())
+				client.put_data(clock)
 				if client.get_available_bytes() > 0:
 					var data = client.get_utf8_string(client.get_available_bytes())
 					print("Host: ", data)
