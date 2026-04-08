@@ -7,6 +7,8 @@ const SPEED: int = 300
 var upInput: String = "w"
 var downInput: String = "s"
 
+var is_local: bool = false
+
 var paddle_id: String = "" 
 var manager: Node = null
 
@@ -14,17 +16,26 @@ func _ready():
 	pass
 
 func _physics_process(delta: float) -> void:
-
-	
 	if not is_multiplayer_authority():
 		return
+	
+	if is_local:
+		_proccess_input(delta)
+	else: 
+		_process_netwrok(delta)
+		
 
+func _proccess_input(delta):
 	if Input.is_action_pressed(upInput) and global_position.y > 0:
 		global_position.y -= SPEED * delta
 	elif Input.is_action_pressed(downInput) and global_position.y < 548:
 		global_position.y += SPEED * delta
 	if manager:
 		manager.pass_paddle_data(paddle_id, global_position.y)
+
+func _process_netwrok(delta):
+	if manager and manager.paddle_states.has(paddle_id):
+		global_position.y = manager.paddle_states[paddle_id]
 
 func set_color(newColor: Color) -> void:
 	if has_node("Box"):

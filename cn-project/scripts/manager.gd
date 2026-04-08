@@ -9,9 +9,11 @@ var ball_data
 func _ready():
 	left.paddle_id = "Host"
 	left.manager = self
+	left.is_local = true #host paddle
 	
 	right.paddle_id = "Client"
 	right.manager = self
+	right.is_local = false #client
 	
 # UI functions
 func start_local_game() -> void:
@@ -56,3 +58,6 @@ func update_physics():
 		"ball": ball_data, 
 		"paddles": paddle_states
 	}
+
+func client_paddle():
+	pass

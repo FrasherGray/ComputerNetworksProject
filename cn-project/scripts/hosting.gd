@@ -87,9 +87,13 @@ func _process(delta: float) -> void:
 		for peer in clients:
 			if peer.get_available_bytes() > 0:
 				var data = peer.get_available_bytes()
-				print("Recived: ", data)
+				manager.client_paddle(data)
 			
-			server.put_data(manager.update_physics())
+			var snapshot = manager.update_physics()
+			var msg = JSON.stringify(snapshot)
+			var data = msg.to_utf8_buffer()
+			
+			peer.put_data(data)
 				
 func _on_line_edit_text_submitted(new_text: String) -> void:
 	user_input = inputed_name.text
