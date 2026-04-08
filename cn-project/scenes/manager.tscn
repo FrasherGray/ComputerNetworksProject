@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://d3l1apje7ogmx" path="res://scripts/point_zone_right.gd" id="6_o1c0c"]
 [ext_resource type="Script" uid="uid://cvcvfhsh86x5u" path="res://scripts/hosting.gd" id="8_3ftge"]
 [ext_resource type="Script" uid="uid://w6a6vchxwvt2" path="res://scripts/server_browser.gd" id="8_j5tnm"]
+[ext_resource type="Script" uid="uid://dw1yrah2gdimw" path="res://scripts/chat.gd" id="8_uujcr"]
 [ext_resource type="Script" uid="uid://cs2sugc56dcpr" path="res://scripts/IP_LIST.gd" id="9_xiihq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xiihq"]
@@ -214,6 +215,39 @@ offset_right = 393.0
 offset_bottom = 310.0
 text = "Empty"
 vertical_alignment = 1
+
+[node name="Chat" type="Control" parent="Menu/Lobby Menu" unique_id=1549396646]
+anchors_preset = 0
+offset_left = 652.0
+offset_top = 150.0
+offset_right = 1152.0
+offset_bottom = 450.0
+script = ExtResource("8_uujcr")
+
+[node name="Backgruond" type="ColorRect" parent="Menu/Lobby Menu/Chat" unique_id=925203055]
+layout_mode = 0
+offset_right = 500.0
+offset_bottom = 300.0
+color = Color(0.09803922, 0.09803922, 0.09803922, 1)
+
+[node name="Message" type="ScrollContainer" parent="Menu/Lobby Menu/Chat" unique_id=1128406020]
+layout_mode = 0
+offset_right = 500.0
+offset_bottom = 250.0
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 3
+
+[node name="History" type="VBoxContainer" parent="Menu/Lobby Menu/Chat/Message" unique_id=409301681]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Text" type="LineEdit" parent="Menu/Lobby Menu/Chat" unique_id=500582086]
+layout_mode = 0
+offset_top = 250.0
+offset_right = 500.0
+offset_bottom = 300.0
+placeholder_text = "type message here .. hit enter to send"
 
 [node name="Start" type="Button" parent="Menu/Lobby Menu" unique_id=1259609234]
 layout_mode = 0
@@ -463,6 +497,8 @@ placeholder_text = "your online name"
 [connection signal="body_entered" from="Game/Point Zone Right" to="Game/Point Zone Right" method="_on_body_entered"]
 [connection signal="timeout" from="Game/Point Zone Right/Timer" to="Game/Point Zone Right" method="_on_timer_timeout"]
 [connection signal="draw" from="Game/left_lable" to="Game/Point Zone Right" method="_on_label_draw"]
+[connection signal="text_changed" from="Menu/Lobby Menu/Chat/Text" to="Menu/Lobby Menu/Chat" method="editMessage"]
+[connection signal="text_submitted" from="Menu/Lobby Menu/Chat/Text" to="Menu/Lobby Menu/Chat" method="sendMessage"]
 [connection signal="pressed" from="Menu/Lobby Menu/Start" to="." method="start_LAN_game"]
 [connection signal="pressed" from="Menu/Lobby Menu/Leave" to="." method="leave_lobby_menu"]
 [connection signal="text_submitted" from="Menu/Host Menu/InputedName" to="Menu/Host Menu" method="_on_line_edit_text_submitted"]

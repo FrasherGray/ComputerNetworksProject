@@ -24,7 +24,7 @@ var sentPositionTicker: int = 0
 
 # Misc Var Declarations
 var UDPPacketBroadcaster: PacketPeerUDP
-var UDPPackedReceiver: PacketPeerUDP = PacketPeerUDP.new()
+var UDPPacketReceiver: PacketPeerUDP = PacketPeerUDP.new()
 @onready var timer_2: Timer = $Game/Ball/Timer2
 
 
@@ -34,7 +34,7 @@ func _ready() -> void:
 		IPAddress = IP.get_local_addresses()[5]
 	else:
 		IPAddress = IP.get_local_addresses()[0]
-	if UDPPackedReceiver.bind(LOBBY_RECEIVER_PORT) == OK:
+	if UDPPacketReceiver.bind(LOBBY_RECEIVER_PORT) == OK:
 		print("Receiver successfully set up")
 	else:
 		print("Receiver failed to bind to receiver port")
@@ -48,34 +48,38 @@ func _ready() -> void:
 	get_node("Menu/Main/PlayerName").set_text(playerName)
 
 func _process(_delta: float) -> void:
-	if UDPPackedReceiver == null:
+	if UDPPacketReceiver == null:
 		return
 
-	while UDPPackedReceiver.get_available_packet_count() > 0:
-		var packet = UDPPackedReceiver.get_packet()
+	while UDPPacketReceiver.get_available_packet_count() > 0:
+		var packet = UDPPacketReceiver.get_packet()
 		print(packet)
-		if UDPPackedReceiver.get_packet_error() != 0:
+		if UDPPacketReceiver.get_packet_error() != 0:
 			#discard packet, it's bad/wrong
 			continue
 		print(inMenu, ", ", isHost, ", ", inLobby)
 		if inMenu:
+			
 			if isHost:
 				if packet[0] == 1 and not lobbyFull:
-					sendHostData(UDPPackedReceiver.get_packet_ip())
+					sendHostData(UDPPacketReceiver.get_packet_ip())
 				elif packet[0] == 2:
 					if lobbyFull:
-						UDPPacketBroadcaster.set_dest_address(UDPPackedReceiver.get_packet_ip(), LOBBY_RECEIVER_PORT)
+						UDPPacketBroadcaster.set_dest_address(UDPPacketReceiver.get_packet_ip(), LOBBY_RECEIVER_PORT)
 						UDPPacketBroadcaster.put_packet(PackedByteArray([0]))
 						UDPPacketBroadcaster.set_dest_address(clientIP, LOBBY_RECEIVER_PORT)
 					lobbyFull = true
 					get_node("Menu/Lobby Menu/Start").set_disabled(false)
 					get_node("Menu/Lobby Menu/Player2").set_text(packet.get_string_from_ascii().right(-1))
-					clientIP = UDPPackedReceiver.get_packet_ip()
+					clientIP = UDPPacketReceiver.get_packet_ip()
 					
 					var namePacket: PackedByteArray = PackedByteArray([4])
 					namePacket.append_array(playerName.to_ascii_buffer())
 				elif packet[0] == 3:
 					client_started_LAN_game(packet.decode_float(1))
+				elif packet[0] == 5:
+					var textMessage: String = packet.get_string_from_ascii().right(-1)
+					get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player2").get_text())
 			else:
 				if inLobby:
 					if packet[0] == 0: # host closed lobby or rejected from lobby
@@ -94,11 +98,14 @@ func _process(_delta: float) -> void:
 						timer_2.start()
 						inMenu = false
 						UDPPacketBroadcaster.set_dest_address(hostIP, GAME_RECEIVER_PORT)
-						UDPPackedReceiver.bind(GAME_RECEIVER_PORT)
+						UDPPacketReceiver.bind(GAME_RECEIVER_PORT)
 						UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
 					elif packet[0] == 4: # host sent you their name
 						var hostName: String = packet.get_string_from_ascii().right(-1)
 						get_node("Menu/Lobby Menu/Player1").set_text(hostName)
+					elif packet[0] == 5:
+						var textMessage: String = packet.get_string_from_ascii().right(-1)
+						get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player1").get_text())
 				elif packet.size() > 1:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())
 					get_node("Menu/Join Menu/Panel").add_row(packetData["Name"], packetData["IP"], 1)
@@ -176,8 +183,10 @@ func sendHostData(toIP: String) -> void:
 
 func requestLobbyData() -> void:
 	print("Requesting lobby data")
-	for child in get_node("Menu/Join Menu/Panel/ServerInfo").get_children():
-		child.queue_free()
+	for c in get_node("Menu/Join Menu/Panel/ServerInfo").get_child_count():
+		if c == 0:
+			continue
+		get_node("Menu/Join Menu/Panel/ServerInfo").get_child(c).queue_free()
 	UDPPacketBroadcaster.put_packet(PackedByteArray([1]))
 
 # UI 
@@ -252,7 +261,7 @@ func client_started_LAN_game(timeSinceConfirm: float) -> void:
 	timer_2.start()
 	inMenu = false
 	UDPPacketBroadcaster.set_dest_address(clientIP, GAME_RECEIVER_PORT)
-	UDPPackedReceiver.bind(GAME_RECEIVER_PORT)
+	UDPPacketReceiver.bind(GAME_RECEIVER_PORT)
 	UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
 
 func _on_back_menu_pressed() -> void:
