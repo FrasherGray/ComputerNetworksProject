@@ -3,6 +3,7 @@ extends CharacterBody2D
 var SPEED = 350
 @onready var timer: Timer = $Timer
 @onready var timer_2: Timer = $Timer2
+@onready var manager: Node = $"../.."
 
 
 func _ready():
@@ -12,7 +13,7 @@ func _ready():
 	# Pick a random angle increment of 45 degrees
 	var angle = [1,4,7,11].pick_random() * 30
 	
-	#convert to red
+	#convert to rad
 	var rad = deg_to_rad(angle)
 	var direction = Vector2(cos(rad), sin(rad))
 
@@ -24,6 +25,8 @@ func _physics_process(delta):
 		return
 
 	velocity = (velocity.bounce(collision.get_normal()) + Vector2(randf_range(-15, 15), randf_range(-15, 15))).normalized() * SPEED
+	
+	manager.padd_ball_data(velocity)
 
 func _on_timer_timeout():
 	if(SPEED >= 500):

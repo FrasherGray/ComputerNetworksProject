@@ -1,6 +1,18 @@
 extends Node
 @onready var timer_2: Timer = $Game/Ball/Timer2
+@onready var left: StaticBody2D = $Game/Left
+@onready var right: StaticBody2D = $Game/Right
 
+var paddle_states = {}
+var ball_data
+
+func _ready():
+	left.paddle_id = "Host"
+	left.manager = self
+	
+	right.paddle_id = "Client"
+	right.manager = self
+	
 # UI functions
 func start_local_game() -> void:
 	get_node("Menu/Main").hide()
@@ -32,3 +44,15 @@ func start_LAN_game():
 func _on_back_menu_pressed() -> void:
 	get_node("Menu/Host Menu").hide()
 	get_node("Menu/Main").show()
+
+func pass_paddle_data(paddleID: String, y_position: float):
+	paddle_states[paddleID] = y_position
+
+func padd_ball_data(vel):
+	ball_data = vel
+	
+func update_physics():
+	return {
+		"ball": ball_data, 
+		"paddles": paddle_states
+	}

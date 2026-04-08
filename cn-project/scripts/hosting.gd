@@ -86,8 +86,10 @@ func _process(delta: float) -> void:
 	if state == 2:
 		for peer in clients:
 			if peer.get_available_bytes() > 0:
-				var data = peer.get_utf8_string(peer.get_available_bytes())
+				var data = peer.get_available_bytes()
 				print("Recived: ", data)
+			
+			server.put_data(manager.update_physics())
 				
 func _on_line_edit_text_submitted(new_text: String) -> void:
 	user_input = inputed_name.text
