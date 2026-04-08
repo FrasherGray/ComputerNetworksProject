@@ -2,12 +2,14 @@ extends Control
 @onready var panel: Panel = $"../Panel"
 @onready var host_menu: Control = $"../../Host Menu"
 
+var IPAddress: String
+
 var client = StreamPeerTCP.new()
 var clock = 0
 var conFlag = false
 
 var packet := PacketPeerStream.new()
-var ip_old = {} 
+var ip_old = {}
 var udp := PacketPeerUDP.new()
 
 enum Status{
@@ -19,6 +21,10 @@ var state = Status.DISCOVERY
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	if OS.has_feature("windows"):
+		IPAddress = IP.get_local_addresses()[5]
+	else:
+		IPAddress = IP.get_local_addresses()[0]
 	udp.bind(9998,"0.0.0.0")
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
