@@ -68,7 +68,9 @@ func _process(delta: float) -> void:
 				
 				print("Connecting")
 			StreamPeerTCP.STATUS_CONNECTED:
-				client.put_data(clock)
+				var buffer = StreamPeerBuffer.new()
+				buffer.put_float(clock)
+				client.put_data(buffer.data_array)
 				if client.get_available_bytes() > 0:
 					var data = client.get_utf8_string(client.get_available_bytes())
 					print("Host: ", data)
