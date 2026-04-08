@@ -59,7 +59,6 @@ func _process(_delta: float) -> void:
 			continue
 		print(inMenu, ", ", isHost, ", ", inLobby)
 		if inMenu:
-			
 			if isHost:
 				if packet[0] == 1 and not lobbyFull:
 					sendHostData(UDPPacketReceiver.get_packet_ip())
@@ -98,7 +97,9 @@ func _process(_delta: float) -> void:
 						timer_2.start()
 						inMenu = false
 						UDPPacketBroadcaster.set_dest_address(hostIP, GAME_RECEIVER_PORT)
+						UDPPacketReceiver.close()
 						UDPPacketReceiver.bind(GAME_RECEIVER_PORT)
+						UDPPacketBroadcaster.close()
 						UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
 					elif packet[0] == 4: # host sent you their name
 						var hostName: String = packet.get_string_from_ascii().right(-1)
@@ -108,7 +109,7 @@ func _process(_delta: float) -> void:
 						get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player1").get_text())
 				elif packet.size() > 1:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())
-					get_node("Menu/Join Menu/Panel").add_row(packetData["Name"], packetData["IP"], 1)
+					get_node("Menu/Join Menu/Panel").add_row(packetData["Lobby"], UDPPacketReceiver.get_packet_ip(), 1)
 		else:
 			match packet[0]:
 				0: # other player moved paddle
@@ -261,7 +262,9 @@ func client_started_LAN_game(timeSinceConfirm: float) -> void:
 	timer_2.start()
 	inMenu = false
 	UDPPacketBroadcaster.set_dest_address(clientIP, GAME_RECEIVER_PORT)
+	UDPPacketReceiver.close()
 	UDPPacketReceiver.bind(GAME_RECEIVER_PORT)
+	UDPPacketBroadcaster.close()
 	UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
 
 func _on_back_menu_pressed() -> void:
