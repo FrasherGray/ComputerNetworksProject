@@ -26,7 +26,7 @@ func _physics_process(delta):
 
 	velocity = (velocity.bounce(collision.get_normal()) + Vector2(randf_range(-15, 15), randf_range(-15, 15))).normalized() * SPEED
 	
-	manager.padd_ball_data(velocity)
+	manager.pass_ball_data(velocity)
 
 func _on_timer_timeout():
 	if(SPEED >= 500):

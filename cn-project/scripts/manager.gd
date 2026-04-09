@@ -50,7 +50,7 @@ func _on_back_menu_pressed() -> void:
 func pass_paddle_data(paddleID: String, y_position: float):
 	paddle_states[paddleID] = y_position
 
-func padd_ball_data(vel):
+func pass_ball_data(vel):
 	ball_data = vel
 	
 func update_physics():
@@ -59,5 +59,5 @@ func update_physics():
 		"paddles": paddle_states
 	}
 
-func client_paddle():
-	pass
+func client_paddle(p):
+	right.position = Vector2(0,p)
