@@ -114,25 +114,27 @@ func _process(_delta: float) -> void:
 			match packet[0]:
 				0: # other player moved paddle
 					if isHost: # other player's paddle is the right one
-						get_node("Game/Right").set_global_position(Vector2(packet[1], packet[2]))
+						get_node("Game/Right").global_position.y = packet[1] * 255 + packet[2]
 					else:
-						get_node("Game/Left").set_global_position(Vector2(packet[1], packet[2]))
+						get_node("Game/Left").global_position.y = packet[1] * 255 + packet[2]
 				1: # ball bounced
 					var newVelocity: Vector2 = Vector2(packet[1] + packet[2], packet[3] + packet[4])
-					var synchronizedPosition: Vector2 = Vector2(packet[5], packet[6])
+					var synchronizedPosition: Vector2 = Vector2(packet[5] * 255 + packet[6], packet[7] * 255 + packet[8])
 					get_node("Game/Ball").velocity = newVelocity
 					get_node("Game/Ball").set_global_position(synchronizedPosition)
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if inMenu:
 		return
 
 	if sentPositionTicker == 8:
 		var packet: PackedByteArray
+		var yValue: int
 		if isHost:
-			packet = PackedByteArray([0, roundi(get_node("Game/Left").get_global_position().x), roundi(get_node("Game/Left").get_global_position().y)])
+			yValue = roundi(get_node("Game/Left").get_global_position().y)
 		else:
-			packet = PackedByteArray([0, roundi(get_node("Game/Right").get_global_position().x), roundi(get_node("Game/Right").get_global_position().y)])
+			yValue = roundi(get_node("Game/Left").get_global_position().y)
+		packet = PackedByteArray([0, yValue / 255, yValue % 255])
 		UDPPacketBroadcaster.put_packet(packet)
 		sentPositionTicker = 0
 	else:
@@ -148,7 +150,8 @@ func ballBounced(newVelocity: Vector2i) -> void:
 		velocityPacket.append_array([newVelocity.y - 255, 255])
 	else:
 		velocityPacket.append_array([0, newVelocity.y])
-	velocityPacket.append_array([get_node("Game/Ball").get_global_position().x, get_node("Game/Ball").get_global_position().y])
+	var ballVelocity: Vector2 = get_node("Game/Ball").get_global_position()
+	velocityPacket.append_array([roundi(ballVelocity.x / 255.0), int(ballVelocity.x) % 255, roundi(ballVelocity.x / 255.0), int(ballVelocity.x) % 255])
 	UDPPacketBroadcaster.put_packet(velocityPacket)
 
 func setupHost() -> bool:

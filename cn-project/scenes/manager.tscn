@@ -44,20 +44,6 @@ font_size = 35
 shadow_size = 8
 shadow_color = Color(0, 0, 0, 1)
 
-[sub_resource type="GDScript" id="GDScript_j5tnm"]
-script/source = "extends Timer
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-"
-
 [node name="Manager" type="Node" unique_id=2057561498]
 script = ExtResource("1_bdh1m")
 
@@ -345,10 +331,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("8_j5tnm")
 
-[node name="Broadcast Timer" type="Timer" parent="Menu/Join Menu/Server Browser" unique_id=20927350]
-autostart = true
-script = SubResource("GDScript_j5tnm")
-
 [node name="Panel" type="Panel" parent="Menu/Join Menu" unique_id=1828146815]
 custom_minimum_size = Vector2(100, 12)
 layout_mode = 0
@@ -504,7 +486,6 @@ placeholder_text = "your online name"
 [connection signal="text_submitted" from="Menu/Host Menu/InputedName" to="Menu/Host Menu" method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="Menu/Host Menu/BackMenu" to="." method="_on_back_menu_pressed"]
 [connection signal="pressed" from="Menu/Host Menu/Host" to="." method="create_host_lobby"]
-[connection signal="timeout" from="Menu/Join Menu/Server Browser/Broadcast Timer" to="Menu/Join Menu/Server Browser" method="_on_broadcast_timer_timeout"]
 [connection signal="pressed" from="Menu/Join Menu/subMenuJoinBack" to="." method="_on_sub_menu_join_back_pressed"]
 [connection signal="pressed" from="Menu/Join Menu/RefreshList" to="." method="requestLobbyData"]
 [connection signal="pressed" from="Menu/Multiplayer/Host" to="." method="_on_host_pressed"]

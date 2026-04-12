@@ -1,8 +1,5 @@
 extends Control
 
-signal found_server
-signal server_removed
-
 var brodcastTimer : Timer
 var broadcaster: PacketPeerUDP
 
@@ -19,7 +16,3 @@ func setUpBroadCast(name):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
-
-
-func _on_broadcast_timer_timeout() -> void:
-	pass # Replace with function body.
