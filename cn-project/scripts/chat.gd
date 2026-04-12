@@ -3,9 +3,22 @@ extends Control
 @onready var manager = get_parent().get_parent().get_parent()
 
 var lastMaxScroll: float = 0.0
+var messageSentCounter: float = 0.0
+var messageQueue: PackedStringArray = []
 
 func _ready() -> void:
 	get_node("Message").get_v_scroll_bar().connect("changed", addScroll)
+
+func _process(delta: float) -> void:
+	messageSentCounter += delta
+	if messageQueue.size() != 0 and messageSentCounter > 0.2:
+		messageSentCounter = 0.0
+		var message: PackedByteArray = PackedByteArray([5])
+		message.append_array(messageQueue[0].to_ascii_buffer())
+		print(manager.UDPPacketBroadcaster.is_socket_connected())
+		if manager.UDPPacketBroadcaster.is_socket_connected():
+			manager.UDPPacketBroadcaster.put_packet(message)
+		addMessage(messageQueue[0], "")
 
 func addMessage(text: String, sender: String) -> void:
 	var message = Label.new()
@@ -23,14 +36,9 @@ func addMessage(text: String, sender: String) -> void:
 		await get_tree().process_frame
 
 func sendMessage(text: String) -> void:
-	var message: PackedByteArray = PackedByteArray([5])
-	message.append_array(text.to_ascii_buffer())
-	print(manager.UDPPacketBroadcaster.is_socket_connected())
-	if manager.UDPPacketBroadcaster.is_socket_connected():
-		manager.UDPPacketBroadcaster.put_packet(message)
+	messageQueue.append(text)
 	get_node("Text").set_text("")
 	get_node("Text").release_focus()
-	addMessage(text, "")
 
 func editMessage(text: String) -> void:
 	if len(text) > 100:

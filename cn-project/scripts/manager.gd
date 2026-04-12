@@ -79,6 +79,9 @@ func _process(_delta: float) -> void:
 				elif packet[0] == 5:
 					var textMessage: String = packet.get_string_from_ascii().right(-1)
 					get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player2").get_text())
+					UDPPacketBroadcaster.put_packet(PackedByteArray([6]))
+				elif packet[0] == 6:
+					get_node("Menu/Lobby Menu/Chat").messageQueue.erase(0)
 			else:
 				if inLobby:
 					if packet[0] == 0: # host closed lobby or rejected from lobby
@@ -107,6 +110,9 @@ func _process(_delta: float) -> void:
 					elif packet[0] == 5:
 						var textMessage: String = packet.get_string_from_ascii().right(-1)
 						get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player1").get_text())
+						UDPPacketBroadcaster.put_packet(PackedByteArray([6]))
+					elif packet[0] == 6:
+						get_node("Menu/Lobby Menu/Chat").messageQueue.erase(0)
 				elif packet.size() > 1:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())
 					get_node("Menu/Join Menu/Panel").add_row(packetData["Lobby"], UDPPacketReceiver.get_packet_ip(), 1)
