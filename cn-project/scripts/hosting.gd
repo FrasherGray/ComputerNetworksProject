@@ -25,6 +25,8 @@ enum NetState{
 var state = NetState.DISCOVERY
 
 var timer = 0.0
+const SEND_RATE = 1.0 / 20.0  # 20 snapshots per second is plenty for LAN pong
+var client_recv_buf = ""      # accumulates raw TCP bytes until a full \n-delimited message arrives
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -85,18 +87,30 @@ func _process(delta: float) -> void:
 			on_connection()
 			
 	if state == 2:
+		timer += delta
 		for peer in clients:
-			# Read client paddle position
+			# Accumulate incoming bytes into buffer, parse every complete newline-delimited message.
+			# Keep only the last one — earlier messages are stale paddle positions.
 			if peer.get_available_bytes() > 0:
-				var raw = peer.get_utf8_string(peer.get_available_bytes())
-				var data = JSON.parse_string(raw)
-				if data and data.has("py"):
-					manager.client_paddle(float(data["py"]))
+				client_recv_buf += peer.get_utf8_string(peer.get_available_bytes())
+			var last_paddle = null
+			while "\n" in client_recv_buf:
+				var idx = client_recv_buf.find("\n")
+				var line = client_recv_buf.substr(0, idx)
+				client_recv_buf = client_recv_buf.substr(idx + 1)
+				if line.length() > 0:
+					var json = JSON.new()
+					if json.parse(line) == OK and json.data.has("py"):
+						last_paddle = json.data
+			if last_paddle:
+				manager.client_paddle(float(last_paddle["py"]))
 			
-			# Send authoritative game state to client
-			var snapshot = manager.update_physics()
-			var msg = JSON.stringify(snapshot)
-			peer.put_data(msg.to_utf8_buffer())
+			# Send snapshot at a fixed rate to avoid flooding the TCP buffer
+			if timer >= SEND_RATE:
+				var snapshot = manager.update_physics()
+				peer.put_data((JSON.stringify(snapshot) + "\n").to_utf8_buffer())
+		if timer >= SEND_RATE:
+			timer = 0.0
 				
 func _on_line_edit_text_submitted(new_text: String) -> void:
 	user_input = inputed_name.text

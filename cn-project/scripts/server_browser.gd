@@ -12,6 +12,9 @@ var conFlag = false
 var packet := PacketPeerStream.new()
 var ip_old = {}
 var udp := PacketPeerUDP.new()
+var host_recv_buf = ""       # accumulates TCP bytes until a full \n-delimited snapshot arrives
+var send_timer = 0.0
+const SEND_RATE = 1.0 / 20.0  # send paddle at 20 Hz — matches host snapshot rate
 
 enum Status{
 	DISCOVERY,
@@ -81,16 +84,28 @@ func _process(delta: float) -> void:
 				print("Connection Failed")
 	if state == 2:
 		client.poll()
-		# Send our paddle Y position to the host every frame
-		if manager.paddle_states.has("Client"):
-			var out = JSON.stringify({"py": manager.paddle_states["Client"]})
-			client.put_data(out.to_utf8_buffer())
-		# Receive and apply host's authoritative game state
+		# Accumulate incoming bytes; snapshots from host are \n-terminated
 		if client.get_available_bytes() > 0:
-			var raw = client.get_utf8_string(client.get_available_bytes())
-			var snapshot = JSON.parse_string(raw)
-			if snapshot and typeof(snapshot) == TYPE_DICTIONARY:
-				manager.apply_game_state(snapshot)
+			host_recv_buf += client.get_utf8_string(client.get_available_bytes())
+		# Drain all complete messages, keep only the latest to skip stale frames
+		var last_snapshot = null
+		while "\n" in host_recv_buf:
+			var idx = host_recv_buf.find("\n")
+			var line = host_recv_buf.substr(0, idx)
+			host_recv_buf = host_recv_buf.substr(idx + 1)
+			if line.length() > 0:
+				var json = JSON.new()
+				if json.parse(line) == OK and typeof(json.data) == TYPE_DICTIONARY:
+					last_snapshot = json.data
+			if last_snapshot:
+				manager.apply_game_state(last_snapshot)
+		# Rate-limited paddle send — must include \n so host buffer can split correctly
+		send_timer += delta
+		if send_timer >= SEND_RATE:
+			send_timer = 0.0
+			if manager.paddle_states.has("Client"):
+				var out = JSON.stringify({"py": manager.paddle_states["Client"]}) + "\n"
+				client.put_data(out.to_utf8_buffer())
 func connect_to_server(ip: String, port: int):
 	
 	udp.set_broadcast_enabled(true)
