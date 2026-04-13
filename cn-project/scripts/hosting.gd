@@ -144,21 +144,37 @@ func on_connection():
 	manager.start_LAN_game()
 
 func _handle_client_report(report: Dictionary) -> void:
-	print("=== CLIENT LATENCY REPORT ===")
 	var total_rtt = 0
 	for entry in rtt_log:
 		total_rtt += entry["rtt_ms"]
 	var avg_rtt = (total_rtt / rtt_log.size()) if rtt_log.size() > 0 else 0
-	print("Host RTT log — %d packets, avg %d ms" % [rtt_log.size(), avg_rtt])
+
+	var lines = []
+	lines.append("=== LATENCY REPORT ===")
+	lines.append("Generated: %s" % Time.get_datetime_string_from_system())
+	lines.append("")
+	lines.append("HOST RTT LOG — %d packets, avg %d ms" % [rtt_log.size(), avg_rtt])
 	for entry in rtt_log:
-		print("  seq=%-5d  rtt=%d ms" % [entry["seq"], entry["rtt_ms"]])
+		lines.append("  seq=%-5d  rtt=%d ms" % [entry["seq"], entry["rtt_ms"]])
+	lines.append("")
 	if report.has("recv_log"):
-		print("Client recv log — %d snapshots received" % report["recv_log"].size())
+		lines.append("CLIENT RECV LOG — %d snapshots received" % report["recv_log"].size())
 		for entry in report["recv_log"]:
-			print("  seq=%-5d  host_ts=%-8d  client_recv_at=%d ms" % [entry["seq"], entry["host_ts"], entry["recv_ms"]])
+			lines.append("  seq=%-5d  host_ts=%-8d  client_recv_at=%d ms" % [entry["seq"], entry["host_ts"], entry["recv_ms"]])
+		lines.append("")
 	if report.has("send_log"):
-		print("Client send log — %d paddle packets sent" % report["send_log"].size())
+		lines.append("CLIENT SEND LOG — %d paddle packets sent" % report["send_log"].size())
 		for entry in report["send_log"]:
-			print("  send_at=%-8d ms  py=%.1f" % [entry["send_ms"], entry["py"]])
-	print("=== END REPORT ===")
+			lines.append("  send_at=%-8d ms  py=%.1f" % [entry["send_ms"], entry["py"]])
+		lines.append("")
+	lines.append("=== END REPORT ===")
+
+	var path = "user://latency_report_%s.txt" % Time.get_datetime_string_from_system().replace(":", "-")
+	var f = FileAccess.open(path, FileAccess.WRITE)
+	if f:
+		f.store_string("\n".join(lines))
+		f.close()
+		print("Latency report saved to: ", ProjectSettings.globalize_path(path))
+	else:
+		print("Failed to write latency report: ", FileAccess.get_open_error())
 	
