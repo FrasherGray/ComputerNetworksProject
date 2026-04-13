@@ -1,6 +1,7 @@
 extends Control
 @onready var panel: Panel = $"../Panel"
 @onready var host_menu: Control = $"../../Host Menu"
+@onready var manager: Node = $"../../.."
 
 var IPAddress: String
 
@@ -74,16 +75,22 @@ func _process(delta: float) -> void:
 				
 				print("Connecting")
 			StreamPeerTCP.STATUS_CONNECTED:
-				var buffer = StreamPeerBuffer.new()
-				buffer.put_float(clock)
-				client.put_data(buffer.data_array)
-				if client.get_available_bytes() > 0:
-					var data = client.get_utf8_string(client.get_available_bytes())
-					print("Host: ", data)
+				state = Status.CONNECTED
+				manager.start_client_game()
 			StreamPeerTCP.STATUS_ERROR:
 				print("Connection Failed")
 	if state == 2:
-		pass
+		client.poll()
+		# Send our paddle Y position to the host every frame
+		if manager.paddle_states.has("Client"):
+			var out = JSON.stringify({"py": manager.paddle_states["Client"]})
+			client.put_data(out.to_utf8_buffer())
+		# Receive and apply host's authoritative game state
+		if client.get_available_bytes() > 0:
+			var raw = client.get_utf8_string(client.get_available_bytes())
+			var snapshot = JSON.parse_string(raw)
+			if snapshot and typeof(snapshot) == TYPE_DICTIONARY:
+				manager.apply_game_state(snapshot)
 func connect_to_server(ip: String, port: int):
 	
 	udp.set_broadcast_enabled(true)

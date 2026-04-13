@@ -2,6 +2,7 @@ extends Node
 @onready var timer_2: Timer = $Game/Ball/Timer2
 @onready var left: StaticBody2D = $Game/Left
 @onready var right: StaticBody2D = $Game/Right
+@onready var ball_node: CharacterBody2D = $Game/Ball
 
 var paddle_states = {}
 var ball_data
@@ -55,9 +56,35 @@ func pass_ball_data(vel):
 	
 func update_physics():
 	return {
-		"ball": ball_data, 
+		"ball": {
+			"px": ball_node.global_position.x,
+			"py": ball_node.global_position.y,
+			"vx": ball_data.x if ball_data else 0.0,
+			"vy": ball_data.y if ball_data else 0.0
+		},
 		"paddles": paddle_states
 	}
 
-func client_paddle(p):
-	right.position = Vector2(0,p)
+# Called by host networking: stores received client paddle Y so right paddle's
+# _process_netwrok() can pick it up on the next physics frame.
+func client_paddle(p: float):
+	paddle_states["Client"] = p
+
+# Called by client networking: applies the host's authoritative game state.
+func apply_game_state(snapshot: Dictionary):
+	if snapshot.has("ball"):
+		var bd = snapshot["ball"]
+		ball_node.global_position = Vector2(float(bd["px"]), float(bd["py"]))
+		ball_node.velocity = Vector2(float(bd["vx"]), float(bd["vy"]))
+	if snapshot.has("paddles") and snapshot["paddles"].has("Host"):
+		paddle_states["Host"] = float(snapshot["paddles"]["Host"])
+
+# Called when this machine joins as a client.
+# Flips paddle ownership: right = local (client controls it),
+# left = network-driven (host position arrives via apply_game_state).
+func start_client_game():
+	left.is_local = false
+	right.is_local = true
+	ball_node.set_physics_process(false) # host is authoritative; client just renders
+	get_node("Menu/Join Menu").hide()
+	get_node("Game").show()

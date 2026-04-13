@@ -82,18 +82,21 @@ func _process(delta: float) -> void:
 			print("Connecting:" ,ip_client)
 			print("CLIENT connected")
 			state = NetState.CONNECTED
+			on_connection()
 			
 	if state == 2:
 		for peer in clients:
+			# Read client paddle position
 			if peer.get_available_bytes() > 0:
-				var data = peer.get_available_bytes()
-				manager.client_paddle(data)
+				var raw = peer.get_utf8_string(peer.get_available_bytes())
+				var data = JSON.parse_string(raw)
+				if data and data.has("py"):
+					manager.client_paddle(float(data["py"]))
 			
+			# Send authoritative game state to client
 			var snapshot = manager.update_physics()
 			var msg = JSON.stringify(snapshot)
-			var data = msg.to_utf8_buffer()
-			
-			peer.put_data(data)
+			peer.put_data(msg.to_utf8_buffer())
 				
 func _on_line_edit_text_submitted(new_text: String) -> void:
 	user_input = inputed_name.text
