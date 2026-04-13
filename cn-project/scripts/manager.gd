@@ -88,3 +88,16 @@ func start_client_game():
 	ball_node.set_physics_process(false) # host is authoritative; client just renders
 	get_node("Menu/Join Menu").hide()
 	get_node("Game").show()
+
+func game_over(winner: String):
+	# Stop the ball so no more points can be scored
+	ball_node.set_physics_process(false)
+	ball_node.velocity = Vector2.ZERO
+	# Show result then return to main menu
+	get_node("Game").hide()
+	var main = get_node("Menu/Main")
+	main.show()
+	# Display winner on whatever label is available in Main; adjust node path if needed
+	var result_label = main.get_node_or_null("WinnerLabel")
+	if result_label:
+		result_label.text = winner + " Player Wins!"
