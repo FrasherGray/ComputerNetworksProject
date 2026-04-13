@@ -6,6 +6,7 @@ extends Node
 
 var paddle_states = {}
 var ball_data
+var net_client = null  # set when joining as client; used to request latency report at game end
 
 func _ready():
 	left.paddle_id = "Host"
@@ -82,7 +83,8 @@ func apply_game_state(snapshot: Dictionary):
 # Called when this machine joins as a client.
 # Flips paddle ownership: right = local (client controls it),
 # left = network-driven (host position arrives via apply_game_state).
-func start_client_game():
+func start_client_game(browser: Node):
+	net_client = browser
 	left.is_local = false
 	right.is_local = true
 	ball_node.set_physics_process(false) # host is authoritative; client just renders
@@ -90,14 +92,15 @@ func start_client_game():
 	get_node("Game").show()
 
 func game_over(winner: String):
-	# Stop the ball so no more points can be scored
 	ball_node.set_physics_process(false)
 	ball_node.velocity = Vector2.ZERO
+	# Ask client to flush its latency log before tearing down
+	if net_client:
+		net_client.send_latency_report()
 	# Show result then return to main menu
 	get_node("Game").hide()
 	var main = get_node("Menu/Main")
 	main.show()
-	# Display winner on whatever label is available in Main; adjust node path if needed
 	var result_label = main.get_node_or_null("WinnerLabel")
 	if result_label:
 		result_label.text = winner + " Player Wins!"

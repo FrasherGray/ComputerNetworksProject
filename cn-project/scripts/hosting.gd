@@ -27,6 +27,8 @@ var state = NetState.DISCOVERY
 var timer = 0.0
 const SEND_RATE = 1.0 / 20.0  # 20 snapshots per second is plenty for LAN pong
 var client_recv_buf = ""      # accumulates raw TCP bytes until a full \n-delimited message arrives
+var seq: int = 0              # incremented with every snapshot sent; echoed by client for RTT
+var rtt_log = []              # [{seq, rtt_ms}] round-trip times computed from client echo
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -100,14 +102,24 @@ func _process(delta: float) -> void:
 				client_recv_buf = client_recv_buf.substr(idx + 1)
 				if line.length() > 0:
 					var json = JSON.new()
-					if json.parse(line) == OK and json.data.has("py"):
-						last_paddle = json.data
+					if json.parse(line) == OK and typeof(json.data) == TYPE_DICTIONARY:
+						var d = json.data
+						if d.has("type") and d["type"] == "report":
+							_handle_client_report(d)
+						elif d.has("py"):
+							last_paddle = d
+							if d.has("echo_ts"):
+								var rtt = Time.get_ticks_msec() - int(d["echo_ts"])
+								rtt_log.append({"seq": d.get("echo_seq", -1), "rtt_ms": rtt})
 			if last_paddle:
 				manager.client_paddle(float(last_paddle["py"]))
 			
-			# Send snapshot at a fixed rate to avoid flooding the TCP buffer
+			# Send snapshot at a fixed rate; embed seq+ts so client can echo for RTT measurement
 			if timer >= SEND_RATE:
+				seq += 1
 				var snapshot = manager.update_physics()
+				snapshot["seq"] = seq
+				snapshot["ts"] = Time.get_ticks_msec()
 				peer.put_data((JSON.stringify(snapshot) + "\n").to_utf8_buffer())
 		if timer >= SEND_RATE:
 			timer = 0.0
@@ -130,4 +142,23 @@ func setup_server():
 func on_connection():
 	connection.text = "Connection Successfull!"
 	manager.start_LAN_game()
+
+func _handle_client_report(report: Dictionary) -> void:
+	print("=== CLIENT LATENCY REPORT ===")
+	var total_rtt = 0
+	for entry in rtt_log:
+		total_rtt += entry["rtt_ms"]
+	var avg_rtt = (total_rtt / rtt_log.size()) if rtt_log.size() > 0 else 0
+	print("Host RTT log — %d packets, avg %d ms" % [rtt_log.size(), avg_rtt])
+	for entry in rtt_log:
+		print("  seq=%-5d  rtt=%d ms" % [entry["seq"], entry["rtt_ms"]])
+	if report.has("recv_log"):
+		print("Client recv log — %d snapshots received" % report["recv_log"].size())
+		for entry in report["recv_log"]:
+			print("  seq=%-5d  host_ts=%-8d  client_recv_at=%d ms" % [entry["seq"], entry["host_ts"], entry["recv_ms"]])
+	if report.has("send_log"):
+		print("Client send log — %d paddle packets sent" % report["send_log"].size())
+		for entry in report["send_log"]:
+			print("  send_at=%-8d ms  py=%.1f" % [entry["send_ms"], entry["py"]])
+	print("=== END REPORT ===")
 	
