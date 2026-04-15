@@ -4,6 +4,7 @@ extends Node
 @onready var right: StaticBody2D = $Game/Right
 @onready var ball_node: CharacterBody2D = $Game/Ball
 @onready var server_browser: Control = $"Menu/Join Menu/Server Browser"
+@onready var host_menu: Control = $"Menu/Host Menu"
 
 var paddle_states = {}
 var ball_data
@@ -98,5 +99,6 @@ func game_over(winner: String):
 	get_node("Game").hide()
 	var main = get_node("Menu/Main")
 	main.show()
-	var lat = server_browser.avg_latency
-	print("Client Latency:", lat)
+	#var Host = hosting.avg_latency
+	var Client = server_browser.avg_latency
+	print("Client Latency:", Client, "MS")

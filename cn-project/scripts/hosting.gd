@@ -22,6 +22,9 @@ enum NetState{
 	CONNECTED
 }
 
+var avg_latency := 0.0
+const SMOOTHING = 0.5
+
 var state = NetState.DISCOVERY
 
 var timer = 0.0
@@ -108,7 +111,7 @@ func _process(delta: float) -> void:
 			# Send snapshot at a fixed rate to avoid flooding the TCP buffer
 			if timer >= SEND_RATE:
 				var packet = {
-					"time": Time.get_unix_time_from_system(),
+					"time": Time.get_ticks_msec(),
 					"data": manager.update_physics()
 				}
 				peer.put_data((JSON.stringify(packet) + "\n").to_utf8_buffer())
