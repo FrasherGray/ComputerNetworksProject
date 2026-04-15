@@ -1,0 +1,400 @@
+[gd_scene format=3 uid="uid://fcku3xu32q7s"]
+
+[ext_resource type="Script" uid="uid://dvuo2bc61gasv" path="res://scripts/manager.gd" id="1_bdh1m"]
+[ext_resource type="Script" uid="uid://ebbhyjjt2shc" path="res://scripts/left_paddle.gd" id="2_21v6b"]
+[ext_resource type="Theme" uid="uid://b4usp2gaytnco" path="res://themes/menu_theme.tres" id="2_bgrh2"]
+[ext_resource type="Script" uid="uid://ck0nmesf0cr6b" path="res://scripts/right_paddle.gd" id="3_gq280"]
+[ext_resource type="Script" uid="uid://y74ovt2abtsj" path="res://scripts/ball.gd" id="4_gq280"]
+[ext_resource type="Script" uid="uid://tpswf3j8cluc" path="res://scripts/point_zone_left.gd" id="5_cphvb"]
+[ext_resource type="Script" uid="uid://d3l1apje7ogmx" path="res://scripts/point_zone_right.gd" id="6_o1c0c"]
+[ext_resource type="Script" uid="uid://cvcvfhsh86x5u" path="res://scripts/hosting.gd" id="8_3ftge"]
+[ext_resource type="Script" uid="uid://w6a6vchxwvt2" path="res://scripts/server_browser.gd" id="8_j5tnm"]
+[ext_resource type="Script" uid="uid://cs2sugc56dcpr" path="res://scripts/IP_LIST.gd" id="9_xiihq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xiihq"]
+size = Vector2(30, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3ftge"]
+size = Vector2(30, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cphvb"]
+size = Vector2(25, 25)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_cphvb"]
+normal = Vector2(1, 0)
+distance = -28.004883
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o1c0c"]
+size = Vector2(1151, 11)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j5tnm"]
+size = Vector2(1151, 20)
+
+[sub_resource type="LabelSettings" id="LabelSettings_j5tnm"]
+font_size = 42
+
+[sub_resource type="LabelSettings" id="LabelSettings_xiihq"]
+font_size = 35
+shadow_size = 10
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_o1c0c"]
+font_size = 35
+shadow_size = 8
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="GDScript" id="GDScript_j5tnm"]
+script/source = "extends Timer
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[node name="Manager" type="Node" unique_id=2057561498]
+script = ExtResource("1_bdh1m")
+
+[node name="Game" type="Node2D" parent="." unique_id=1241498537]
+visible = false
+
+[node name="Left" type="StaticBody2D" parent="Game" unique_id=1203054200]
+script = ExtResource("2_21v6b")
+
+[node name="Box" type="ColorRect" parent="Game/Left" unique_id=1109662958]
+offset_right = 30.0
+offset_bottom = 100.0
+
+[node name="Form" type="CollisionShape2D" parent="Game/Left" unique_id=1270465579]
+position = Vector2(15, 50)
+shape = SubResource("RectangleShape2D_xiihq")
+
+[node name="Right" type="StaticBody2D" parent="Game" unique_id=130231844]
+position = Vector2(1122, 0)
+script = ExtResource("3_gq280")
+
+[node name="Box" type="ColorRect" parent="Game/Right" unique_id=782032229]
+offset_right = 30.0
+offset_bottom = 100.0
+
+[node name="Form" type="CollisionShape2D" parent="Game/Right" unique_id=1504332203]
+position = Vector2(15, 50)
+shape = SubResource("RectangleShape2D_3ftge")
+
+[node name="Ball" type="CharacterBody2D" parent="Game" unique_id=733338226]
+position = Vector2(570, 304)
+collision_layer = 3
+script = ExtResource("4_gq280")
+
+[node name="Box" type="ColorRect" parent="Game/Ball" unique_id=885079526]
+offset_right = 25.0
+offset_bottom = 25.0
+
+[node name="Timer" type="Timer" parent="Game/Ball" unique_id=1269121768]
+wait_time = 5.0
+
+[node name="Timer2" type="Timer" parent="Game/Ball" unique_id=602347389]
+wait_time = 3.0
+one_shot = true
+
+[node name="Form" type="CollisionShape2D" parent="Game/Ball" unique_id=561411283]
+position = Vector2(12.5, 12.5)
+shape = SubResource("RectangleShape2D_cphvb")
+
+[node name="Point Zone Left" type="Area2D" parent="Game" unique_id=1496323349]
+position = Vector2(-19, 300)
+script = ExtResource("5_cphvb")
+
+[node name="Timer" type="Timer" parent="Game/Point Zone Left" unique_id=898571973]
+wait_time = 0.5
+one_shot = true
+
+[node name="Form" type="CollisionShape2D" parent="Game/Point Zone Left" unique_id=693358957]
+position = Vector2(47, -300)
+shape = SubResource("WorldBoundaryShape2D_cphvb")
+
+[node name="Point Zone Right" type="Area2D" parent="Game" unique_id=53522906]
+position = Vector2(1155, 307.99997)
+rotation = 3.1406353
+collision_mask = 2
+script = ExtResource("6_o1c0c")
+
+[node name="Timer" type="Timer" parent="Game/Point Zone Right" unique_id=1908999323]
+wait_time = 0.5
+one_shot = true
+
+[node name="Form" type="CollisionShape2D" parent="Game/Point Zone Right" unique_id=802698436]
+position = Vector2(30.703196, 310.02954)
+shape = SubResource("WorldBoundaryShape2D_cphvb")
+
+[node name="Border" type="StaticBody2D" parent="Game" unique_id=735709460]
+
+[node name="Top" type="CollisionShape2D" parent="Game/Border" unique_id=1554861806]
+position = Vector2(576.5, -6.5)
+shape = SubResource("RectangleShape2D_o1c0c")
+
+[node name="Bottom" type="CollisionShape2D" parent="Game/Border" unique_id=918201004]
+position = Vector2(575.5, 658)
+shape = SubResource("RectangleShape2D_j5tnm")
+
+[node name="Score" type="Label" parent="Game" unique_id=2064080017]
+offset_left = 516.0
+offset_right = 636.0
+offset_bottom = 100.0
+text = "Score"
+label_settings = SubResource("LabelSettings_j5tnm")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="right_label" type="Label" parent="Game" unique_id=1174112358]
+offset_left = 636.0
+offset_top = 100.0
+offset_right = 736.0
+offset_bottom = 200.0
+size_flags_horizontal = 0
+label_settings = SubResource("LabelSettings_xiihq")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="left_lable" type="Label" parent="Game" unique_id=525384277]
+offset_left = 416.0
+offset_top = 100.0
+offset_right = 516.0
+offset_bottom = 201.0
+size_flags_horizontal = 0
+text = "
+"
+label_settings = SubResource("LabelSettings_o1c0c")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="latency" type="Label" parent="Game" unique_id=187418455]
+offset_left = 655.0
+offset_top = 39.0
+offset_right = 773.0
+offset_bottom = 62.0
+text = "Latency: "
+
+[node name="Menu" type="Control" parent="." unique_id=943272792]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme = ExtResource("2_bgrh2")
+
+[node name="Host Menu" type="Control" parent="Menu" unique_id=676045541]
+visible = false
+anchors_preset = 0
+offset_right = 1157.0
+offset_bottom = 657.0
+script = ExtResource("8_3ftge")
+
+[node name="Title" type="Label" parent="Menu/Host Menu" unique_id=1899627282]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 59.0
+offset_right = 236.0
+offset_bottom = 101.0
+text = "HOST GAME:"
+
+[node name="HostName" type="Label" parent="Menu/Host Menu" unique_id=1661397774]
+layout_mode = 0
+offset_left = 102.0
+offset_top = 113.0
+offset_right = 219.0
+offset_bottom = 141.0
+text = "Name:"
+
+[node name="InputedName" type="LineEdit" parent="Menu/Host Menu" unique_id=1590880164]
+layout_mode = 0
+offset_left = 186.0
+offset_top = 106.0
+offset_right = 474.0
+offset_bottom = 142.0
+metadata/_edit_use_anchors_ = true
+
+[node name="Connection" type="Label" parent="Menu/Host Menu" unique_id=2116130531]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 188.0
+offset_right = 486.0
+offset_bottom = 216.0
+text = "Idle Connection"
+metadata/_edit_use_anchors_ = true
+
+[node name="BackMenu" type="Button" parent="Menu/Host Menu" unique_id=1035371794]
+layout_mode = 0
+offset_left = 585.0
+offset_top = 87.0
+offset_right = 745.0
+offset_bottom = 171.0
+text = "BACK"
+
+[node name="Join Menu" type="Control" parent="Menu" unique_id=1956085511]
+visible = false
+anchors_preset = 0
+offset_right = 1151.0
+offset_bottom = 651.0
+
+[node name="ColorRect" type="ColorRect" parent="Menu/Join Menu" unique_id=2096813385]
+custom_minimum_size = Vector2(100, 200)
+layout_mode = 1
+offset_left = 96.0
+offset_top = 242.0
+offset_right = 608.0
+offset_bottom = 442.0
+color = Color(0.21950102, 0.21950102, 0.21950102, 1)
+
+[node name="Server Browser" type="Control" parent="Menu/Join Menu" unique_id=1950035225]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("8_j5tnm")
+
+[node name="Broadcast Timer" type="Timer" parent="Menu/Join Menu/Server Browser" unique_id=20927350]
+autostart = true
+script = SubResource("GDScript_j5tnm")
+
+[node name="Panel" type="Panel" parent="Menu/Join Menu" unique_id=1828146815]
+custom_minimum_size = Vector2(100, 12)
+layout_mode = 0
+offset_left = 94.0
+offset_top = 214.0
+offset_right = 611.0
+offset_bottom = 241.0
+script = ExtResource("9_xiihq")
+
+[node name="ServerInfo" type="VBoxContainer" parent="Menu/Join Menu/Panel" unique_id=1086523099]
+layout_mode = 0
+offset_left = 1.0
+offset_top = -2.0
+offset_right = 516.0
+offset_bottom = 29.0
+
+[node name="subMenuJoinBack" type="Button" parent="Menu/Join Menu" unique_id=842239148]
+layout_mode = 0
+offset_left = 94.0
+offset_top = 51.0
+offset_right = 232.0
+offset_bottom = 116.0
+text = "Back"
+icon_alignment = 1
+
+[node name="Multiplayer" type="Control" parent="Menu" unique_id=774614608]
+visible = false
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="Host" type="Button" parent="Menu/Multiplayer" unique_id=1793669791]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -26.5
+offset_top = -42.0
+offset_right = 26.5
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Host"
+
+[node name="Join" type="Button" parent="Menu/Multiplayer" unique_id=684391512]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -53.5
+offset_top = 6.0
+offset_right = 53.5
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Join Game"
+
+[node name="Main" type="Control" parent="Menu" unique_id=771440536]
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="Local" type="Button" parent="Menu/Main" unique_id=41734649]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -74.0
+offset_right = 60.0
+offset_bottom = -38.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Local Co-op"
+
+[node name="Online" type="Button" parent="Menu/Main" unique_id=1263895373]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -91.5
+offset_top = -18.0
+offset_right = 91.5
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "WLAN Multiplayer"
+
+[node name="Settings" type="Button" parent="Menu/Main" unique_id=1280553571]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -43.0
+offset_top = 38.0
+offset_right = 43.0
+offset_bottom = 74.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Settings"
+
+[node name="Quit" type="Button" parent="Menu/Main" unique_id=320535795]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -161.0
+offset_bottom = 36.0
+grow_horizontal = 0
+text = "Quit to Desktop"
+
+[connection signal="timeout" from="Game/Ball/Timer" to="Game/Ball" method="_on_timer_timeout"]
+[connection signal="timeout" from="Game/Ball/Timer2" to="Game/Ball" method="_on_timer_2_timeout"]
+[connection signal="body_entered" from="Game/Point Zone Left" to="Game/Point Zone Left" method="_on_body_entered"]
+[connection signal="timeout" from="Game/Point Zone Left/Timer" to="Game/Point Zone Left" method="_on_timer_timeout"]
+[connection signal="body_entered" from="Game/Point Zone Right" to="Game/Point Zone Right" method="_on_body_entered"]
+[connection signal="timeout" from="Game/Point Zone Right/Timer" to="Game/Point Zone Right" method="_on_timer_timeout"]
+[connection signal="draw" from="Game/left_lable" to="Game/Point Zone Right" method="_on_label_draw"]
+[connection signal="text_submitted" from="Menu/Host Menu/InputedName" to="Menu/Host Menu" method="_on_line_edit_text_submitted"]
+[connection signal="pressed" from="Menu/Host Menu/BackMenu" to="." method="_on_back_menu_pressed"]
+[connection signal="timeout" from="Menu/Join Menu/Server Browser/Broadcast Timer" to="Menu/Join Menu/Server Browser" method="_on_broadcast_timer_timeout"]
+[connection signal="pressed" from="Menu/Join Menu/subMenuJoinBack" to="." method="_on_sub_menu_join_back_pressed"]
+[connection signal="pressed" from="Menu/Multiplayer/Host" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="Menu/Multiplayer/Join" to="." method="browse_lobby_list"]
+[connection signal="pressed" from="Menu/Main/Local" to="." method="start_local_game"]
+[connection signal="pressed" from="Menu/Main/Online" to="." method="view_multiplayer_menu"]

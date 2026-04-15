@@ -108,8 +108,8 @@ func _process(delta: float) -> void:
 						var sent_time = packet["time"]
 						last_snapshot = packet["data"]
 						
-						var recv_time = Time.get_ticks_msec()
-						var latency = sent_time - recv_time
+						var recv_time = Time.get_time_string_from_system()
+						var latency = recv_time - sent_time
 						
 						avg_latency = lerp(avg_latency, float(latency), SMOOTHING)
 						latencyNode.text = "Latency: " + str(latency) + "ms"

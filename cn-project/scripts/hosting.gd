@@ -111,7 +111,7 @@ func _process(delta: float) -> void:
 			# Send snapshot at a fixed rate to avoid flooding the TCP buffer
 			if timer >= SEND_RATE:
 				var packet = {
-					"time": Time.get_ticks_msec(),
+					"time": Time.get_time_string_from_system(),
 					"data": manager.update_physics()
 				}
 				peer.put_data((JSON.stringify(packet) + "\n").to_utf8_buffer())
