@@ -61,6 +61,7 @@ func _process(delta: float) -> void:
 script = ExtResource("1_bdh1m")
 
 [node name="Game" type="Node2D" parent="." unique_id=1241498537]
+visible = false
 
 [node name="Left" type="StaticBody2D" parent="Game" unique_id=1203054200]
 script = ExtResource("2_21v6b")
@@ -182,7 +183,6 @@ offset_bottom = 62.0
 text = "Latency: "
 
 [node name="Menu" type="Control" parent="." unique_id=943272792]
-visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
