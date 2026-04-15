@@ -278,10 +278,10 @@ func client_started_LAN_game(timeSinceConfirm: float) -> void:
 	timer_2.set_wait_time(3 - (Time.get_unix_time_from_system() - timeSinceConfirm))
 	timer_2.start()
 	inMenu = false
-	UDPPacketBroadcaster.set_dest_address(clientIP, GAME_RECEIVER_PORT)
 	UDPPacketReceiver.close()
 	UDPPacketReceiver.bind(GAME_RECEIVER_PORT)
 	UDPPacketBroadcaster.close()
+	UDPPacketBroadcaster.set_dest_address(clientIP, GAME_RECEIVER_PORT)
 	UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
 
 func _on_back_menu_pressed() -> void:
