@@ -293,10 +293,8 @@ func client_started_LAN_game(timeSinceConfirm: float) -> void:
 	UDPPacketBroadcaster.set_dest_address(clientIP, GAME_RECEIVER_PORT)
 	if UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT) == OK:
 		print("Broadcaster set up for Game")
-		return true
 	else:
 		print("Broadcaster failed to set up for game")
-		return false
 
 func _on_back_menu_pressed() -> void:
 	get_node("Menu/Host Menu").hide()
