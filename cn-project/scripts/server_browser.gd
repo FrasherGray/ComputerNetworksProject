@@ -2,6 +2,7 @@ extends Control
 @onready var panel: Panel = $"../Panel"
 @onready var host_menu: Control = $"../../Host Menu"
 @onready var manager: Node = $"../../.."
+@onready var latencyNode: Label = $"../../../Game/latency"
 
 var IPAddress: String
 
@@ -111,6 +112,7 @@ func _process(delta: float) -> void:
 						var latency = recv_time - sent_time
 						
 						avg_latency = lerp(avg_latency, float(latency), SMOOTHING)
+						latencyNode.text = "Latency: " + str(latency) + "ms"
 						
 			if last_snapshot:
 				manager.apply_game_state(last_snapshot)
