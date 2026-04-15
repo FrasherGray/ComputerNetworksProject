@@ -19,9 +19,13 @@ func _on_timer_timeout() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	#Engine.time_scale = 0.5
+	if get_parent().get_parent().inLobby:
+		return
 	add_point()
 	timer.start()
 
 func add_point():
 	score += 1
 	left_lable.text = str(score)
+	if get_parent().get_parent().isHost:
+		get_parent().get_parent().UDPPacketBroadcaster.put_packet(PackedByteArray([2, 1]))

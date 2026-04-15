@@ -139,6 +139,12 @@ func _process(_delta: float) -> void:
 					var synchronizedPosition: Vector2 = Vector2(packet[5] * 255 + packet[6], packet[7] * 255 + packet[8])
 					get_node("Game/Ball").velocity = newVelocity
 					get_node("Game/Ball").set_global_position(synchronizedPosition)
+				2: # host recorded a point
+					match packet[1]:
+						0:
+							get_node("Game/Point Zone Left").add_point()
+						1:
+							get_node("Game/Point Zone Right").add_point()
 
 func _physics_process(_delta: float) -> void:
 	if inMenu:
