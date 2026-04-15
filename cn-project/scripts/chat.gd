@@ -18,7 +18,6 @@ func _process(delta: float) -> void:
 		print(manager.UDPPacketBroadcaster.is_socket_connected())
 		if manager.UDPPacketBroadcaster.is_socket_connected():
 			manager.UDPPacketBroadcaster.put_packet(message)
-		addMessage(messageQueue[0], "")
 
 func addMessage(text: String, sender: String) -> void:
 	var message = Label.new()

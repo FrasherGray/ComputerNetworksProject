@@ -81,6 +81,7 @@ func _process(_delta: float) -> void:
 					get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player2").get_text())
 					UDPPacketBroadcaster.put_packet(PackedByteArray([6]))
 				elif packet[0] == 6:
+					get_node("Menu/Lobby Menu/Chat").addMessage(get_node("Menu/Lobby Menu/Chat").messageQueue[0], "")
 					get_node("Menu/Lobby Menu/Chat").messageQueue.erase(0)
 			else:
 				if inLobby:
@@ -112,6 +113,7 @@ func _process(_delta: float) -> void:
 						get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player1").get_text())
 						UDPPacketBroadcaster.put_packet(PackedByteArray([6]))
 					elif packet[0] == 6:
+						get_node("Menu/Lobby Menu/Chat").addMessage(get_node("Menu/Lobby Menu/Chat").messageQueue[0], "")
 						get_node("Menu/Lobby Menu/Chat").messageQueue.erase(0)
 				elif packet.size() > 1:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())

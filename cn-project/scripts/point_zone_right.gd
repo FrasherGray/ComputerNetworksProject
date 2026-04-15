@@ -9,7 +9,7 @@ signal pointScored
 var score = 0
 
 func _ready() -> void:
-	get_parent().get_parent().connect("pointScored", get_parent().get_parent().ballBounced)
+	connect("pointScored", get_parent().get_parent().ballBounced)
 
 func _on_timer_timeout() -> void:
 	Engine.time_scale = 1.0
