@@ -3,6 +3,7 @@ extends Node
 @onready var left: StaticBody2D = $Game/Left
 @onready var right: StaticBody2D = $Game/Right
 @onready var ball_node: CharacterBody2D = $Game/Ball
+@onready var server_browser: Control = $"Menu/Join Menu/Server Browser"
 
 var paddle_states = {}
 var ball_data
@@ -97,7 +98,5 @@ func game_over(winner: String):
 	get_node("Game").hide()
 	var main = get_node("Menu/Main")
 	main.show()
-	# Display winner on whatever label is available in Main; adjust node path if needed
-	var result_label = main.get_node_or_null("WinnerLabel")
-	if result_label:
-		result_label.text = winner + " Player Wins!"
+	var lat = server_browser.avg_latency
+	print("Client Latency:", lat)

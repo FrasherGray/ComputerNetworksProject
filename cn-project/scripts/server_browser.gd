@@ -138,6 +138,13 @@ func connect_to_server(ip: String, port: int):
 		print("Connection Failed")
 	state = 1
 
+func close_client() -> void:
+	client.disconnect_from_host()
+	host_recv_buf = ""
+	send_timer = 0.0
+	ip_old.clear()
+	state = Status.DISCOVERY
+
 func send_message(msg: String):
 	pass
 	#packet.put_utf8_string(msg)
