@@ -104,10 +104,16 @@ func _process(_delta: float) -> void:
 						timer_2.start()
 						inMenu = false
 						UDPPacketReceiver.close()
-						UDPPacketReceiver.bind(GAME_RECEIVER_PORT)
+						if UDPPacketReceiver.bind(GAME_RECEIVER_PORT) == OK:
+							print("Receiver set up for Game")
+						else:
+							print("Receiver failed to set up for Game")
 						UDPPacketBroadcaster.close()
 						UDPPacketBroadcaster.set_dest_address(hostIP, GAME_RECEIVER_PORT)
-						UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
+						if UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT) == OK:
+							print("Broadcaster set up for Game")
+						else:
+							print("Broadcaster failed to set up for Game")
 					elif packet[0] == 4: # host sent you their name
 						var hostName: String = packet.get_string_from_ascii().right(-1)
 						get_node("Menu/Lobby Menu/Player1").set_text(hostName)
@@ -144,7 +150,7 @@ func _physics_process(_delta: float) -> void:
 		if isHost:
 			yValue = roundi(get_node("Game/Left").get_global_position().y)
 		else:
-			yValue = roundi(get_node("Game/Left").get_global_position().y)
+			yValue = roundi(get_node("Game/Right").get_global_position().y)
 		packet = PackedByteArray([0, yValue / 255, yValue % 255])
 		UDPPacketBroadcaster.put_packet(packet)
 		sentPositionTicker = 0
@@ -279,10 +285,18 @@ func client_started_LAN_game(timeSinceConfirm: float) -> void:
 	timer_2.start()
 	inMenu = false
 	UDPPacketReceiver.close()
-	UDPPacketReceiver.bind(GAME_RECEIVER_PORT)
+	if UDPPacketReceiver.bind(GAME_RECEIVER_PORT) == OK:
+		print("Receiver set up for Game")
+	else:
+		print("Receiver failed to set up for game")
 	UDPPacketBroadcaster.close()
 	UDPPacketBroadcaster.set_dest_address(clientIP, GAME_RECEIVER_PORT)
-	UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
+	if UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT) == OK:
+		print("Broadcaster set up for Game")
+		return true
+	else:
+		print("Broadcaster failed to set up for game")
+		return false
 
 func _on_back_menu_pressed() -> void:
 	get_node("Menu/Host Menu").hide()
