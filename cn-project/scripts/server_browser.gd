@@ -142,7 +142,7 @@ func send_message(msg: String):
 	pass
 	#packet.put_utf8_string(msg)
 
-# Called by manager.game_over() — sends the full latency log to the host and saves a local copy.
+# Called by manager.game_over() — sends the full latency log to the host as a final packet.
 func send_latency_report() -> void:
 	var report = {
 		"type": "report",
@@ -150,29 +150,7 @@ func send_latency_report() -> void:
 		"send_log": send_log
 	}
 	client.put_data((JSON.stringify(report) + "\n").to_utf8_buffer())
-
-	var lines = []
-	lines.append("=== CLIENT LATENCY LOG ===")
-	lines.append("Generated: %s" % Time.get_datetime_string_from_system())
-	lines.append("")
-	lines.append("RECV LOG — %d snapshots received" % recv_log.size())
-	for entry in recv_log:
-		lines.append("  seq=%-5d  host_ts=%-8d  recv_at=%d ms" % [entry["seq"], entry["host_ts"], entry["recv_ms"]])
-	lines.append("")
-	lines.append("SEND LOG — %d paddle packets sent" % send_log.size())
-	for entry in send_log:
-		lines.append("  send_at=%-8d ms  py=%.1f" % [entry["send_ms"], entry["py"]])
-	lines.append("")
-	lines.append("=== END LOG ===")
-
-	var path = "user://client_latency_%s.txt" % Time.get_datetime_string_from_system().replace(":", "-")
-	var f = FileAccess.open(path, FileAccess.WRITE)
-	if f:
-		f.store_string("\n".join(lines))
-		f.close()
-		print("Client latency log saved to: ", ProjectSettings.globalize_path(path))
-	else:
-		print("Failed to write client log: ", FileAccess.get_open_error())
+	print("Latency report sent — %d snapshots received, %d paddle packets sent" % [recv_log.size(), send_log.size()])
 
 func _on_broadcast_timer_timeout() -> void:
 	pass # Replace with function body.
