@@ -16,6 +16,9 @@ var host_recv_buf = ""       # accumulates TCP bytes until a full \n-delimited s
 var send_timer = 0.0
 const SEND_RATE = 1.0 / 30.0  # send paddle at 20 Hz — matches host snapshot rate
 
+var avg_latency := 0.0
+const SMOOTHING = 0.5
+
 enum Status{
 	DISCOVERY,
 	CONNECTING,
@@ -106,7 +109,8 @@ func _process(delta: float) -> void:
 						
 						var recv_time = Time.get_unix_time_from_system()
 						var latency = recv_time - sent_time
-						print("latency = " , latency)
+						
+						avg_latency = lerp(avg_latency, float(latency), SMOOTHING)
 						
 			if last_snapshot:
 				manager.apply_game_state(last_snapshot)
