@@ -38,6 +38,6 @@ func _on_timer_timeout():
 	velocity = velocity.normalized() * SPEED
 	
 func _on_timer_2_timeout():
-	print("timer2")
 	set_physics_process(true)
-	$Timer.start()
+	timer.start()
+	timer_2.set_wait_time(3)
