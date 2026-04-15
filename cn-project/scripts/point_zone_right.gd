@@ -14,7 +14,7 @@ func _ready() -> void:
 func _on_timer_timeout() -> void:
 	Engine.time_scale = 1.0
 	ball.position = Vector2(576,324)
-	pointScored.emit()
+	pointScored.emit(ball.velocity)
 
 func _on_body_entered(body: Node2D) -> void:
 	#Engine.time_scale = 0.5
