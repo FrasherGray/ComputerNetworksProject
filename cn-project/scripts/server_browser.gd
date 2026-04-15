@@ -15,11 +15,6 @@ var udp := PacketPeerUDP.new()
 var host_recv_buf = ""       # accumulates TCP bytes until a full \n-delimited snapshot arrives
 var send_timer = 0.0
 const SEND_RATE = 1.0 / 20.0  # send paddle at 20 Hz — matches host snapshot rate
-var game_start_ms: int = 0    # Time.get_ticks_msec() when game started; basis for all log timestamps
-var recv_log = []             # [{seq, host_ts, recv_ms}] — one entry per received snapshot
-var send_log = []             # [{send_ms, py}] — one entry per paddle packet sent
-var last_echo_seq: int = -1   # seq from most recent snapshot; echoed in next paddle send
-var last_echo_ts: int = -1    # ts from most recent snapshot; echoed so host can compute RTT
 
 enum Status{
 	DISCOVERY,
@@ -84,8 +79,7 @@ func _process(delta: float) -> void:
 				print("Connecting")
 			StreamPeerTCP.STATUS_CONNECTED:
 				state = Status.CONNECTED
-				game_start_ms = Time.get_ticks_msec()
-				manager.start_client_game(self)
+				manager.start_client_game()
 			StreamPeerTCP.STATUS_ERROR:
 				print("Connection Failed")
 	if state == 2:
@@ -93,7 +87,7 @@ func _process(delta: float) -> void:
 		# Accumulate incoming bytes; snapshots from host are \n-terminated
 		if client.get_available_bytes() > 0:
 			host_recv_buf += client.get_utf8_string(client.get_available_bytes())
-		# Drain all complete messages; record each for logging, apply only the latest
+		# Drain all complete messages, keep only the latest to skip stale frames
 		var last_snapshot = null
 		while "\n" in host_recv_buf:
 			var idx = host_recv_buf.find("\n")
@@ -103,24 +97,15 @@ func _process(delta: float) -> void:
 				var json = JSON.new()
 				if json.parse(line) == OK and typeof(json.data) == TYPE_DICTIONARY:
 					last_snapshot = json.data
-		# Apply only the freshest snapshot — older ones in the buffer are stale
-		if last_snapshot:
-			var recv_ms = Time.get_ticks_msec() - game_start_ms
-			if last_snapshot.has("seq"):
-				recv_log.append({"seq": last_snapshot["seq"], "host_ts": last_snapshot.get("ts", 0), "recv_ms": recv_ms})
-				last_echo_seq = last_snapshot["seq"]
-				last_echo_ts = last_snapshot.get("ts", 0)
-			manager.apply_game_state(last_snapshot)
-		# Rate-limited paddle send — echo host's last seq+ts so it can measure RTT
+			if last_snapshot:
+				manager.apply_game_state(last_snapshot)
+		# Rate-limited paddle send — must include \n so host buffer can split correctly
 		send_timer += delta
 		if send_timer >= SEND_RATE:
 			send_timer = 0.0
 			if manager.paddle_states.has("Client"):
-				var py = manager.paddle_states["Client"]
-				var send_ms = Time.get_ticks_msec() - game_start_ms
-				send_log.append({"send_ms": send_ms, "py": py})
-				var out_data = {"py": py, "echo_seq": last_echo_seq, "echo_ts": last_echo_ts}
-				client.put_data((JSON.stringify(out_data) + "\n").to_utf8_buffer())
+				var out = JSON.stringify({"py": manager.paddle_states["Client"]}) + "\n"
+				client.put_data(out.to_utf8_buffer())
 func connect_to_server(ip: String, port: int):
 	
 	udp.set_broadcast_enabled(true)
@@ -141,16 +126,6 @@ func connect_to_server(ip: String, port: int):
 func send_message(msg: String):
 	pass
 	#packet.put_utf8_string(msg)
-
-# Called by manager.game_over() — sends the full latency log to the host as a final packet.
-func send_latency_report() -> void:
-	var report = {
-		"type": "report",
-		"recv_log": recv_log,
-		"send_log": send_log
-	}
-	client.put_data((JSON.stringify(report) + "\n").to_utf8_buffer())
-	print("Latency report sent — %d snapshots received, %d paddle packets sent" % [recv_log.size(), send_log.size()])
 
 func _on_broadcast_timer_timeout() -> void:
 	pass # Replace with function body.
