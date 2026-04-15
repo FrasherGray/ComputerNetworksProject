@@ -138,6 +138,10 @@ func connect_to_server(ip: String, port: int):
 		print("Connection Failed")
 	state = 1
 
+func send_message(msg: String):
+	pass
+	#packet.put_utf8_string(msg)
+
 # Called by manager.game_over() — sends the full latency log to the host and saves a local copy.
 func send_latency_report() -> void:
 	var report = {
@@ -169,3 +173,6 @@ func send_latency_report() -> void:
 		print("Client latency log saved to: ", ProjectSettings.globalize_path(path))
 	else:
 		print("Failed to write client log: ", FileAccess.get_open_error())
+
+func _on_broadcast_timer_timeout() -> void:
+	pass # Replace with function body.
