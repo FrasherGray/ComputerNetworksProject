@@ -25,7 +25,7 @@ enum NetState{
 var state = NetState.DISCOVERY
 
 var timer = 0.0
-const SEND_RATE = 1.0 / 20.0  # 20 snapshots per second is plenty for LAN pong
+const SEND_RATE = 1.0 / 30.0  # 20 snapshots per second 
 var client_recv_buf = ""      # accumulates raw TCP bytes until a full \n-delimited message arrives
 
 # Called when the node enters the scene tree for the first time.
@@ -107,8 +107,12 @@ func _process(delta: float) -> void:
 			
 			# Send snapshot at a fixed rate to avoid flooding the TCP buffer
 			if timer >= SEND_RATE:
-				var snapshot = manager.update_physics()
-				peer.put_data((JSON.stringify(snapshot) + "\n").to_utf8_buffer())
+				var packet = {
+					"time": Time.get_unix_time_from_system(),
+					"data": manager.update_physics()
+				}
+				peer.put_data((JSON.stringify(packet) + "\n").to_utf8_buffer())
+				
 		if timer >= SEND_RATE:
 			timer = 0.0
 				

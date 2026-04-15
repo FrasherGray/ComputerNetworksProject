@@ -14,7 +14,7 @@ var ip_old = {}
 var udp := PacketPeerUDP.new()
 var host_recv_buf = ""       # accumulates TCP bytes until a full \n-delimited snapshot arrives
 var send_timer = 0.0
-const SEND_RATE = 1.0 / 20.0  # send paddle at 20 Hz — matches host snapshot rate
+const SEND_RATE = 1.0 / 30.0  # send paddle at 20 Hz — matches host snapshot rate
 
 enum Status{
 	DISCOVERY,
@@ -34,8 +34,7 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	clock = delta
-	#if tcp.get_available_bytes() > 0:
-	#	pass
+
 	if not host_menu.is_hosting and state == 0:
 		while udp.get_available_packet_count() > 0:
 			var packet = udp.get_packet()
@@ -84,6 +83,10 @@ func _process(delta: float) -> void:
 				print("Connection Failed")
 	if state == 2:
 		client.poll()
+		if client.get_status() != StreamPeerTCP.STATUS_CONNECTED:
+			print("Disconnected from host")
+			state = Status.DISCOVERY
+			return
 		# Accumulate incoming bytes; snapshots from host are \n-terminated
 		if client.get_available_bytes() > 0:
 			host_recv_buf += client.get_utf8_string(client.get_available_bytes())
@@ -96,7 +99,15 @@ func _process(delta: float) -> void:
 			if line.length() > 0:
 				var json = JSON.new()
 				if json.parse(line) == OK and typeof(json.data) == TYPE_DICTIONARY:
-					last_snapshot = json.data
+					var packet = json.data
+					if packet.has("time") and packet.has("data"):
+						var sent_time = packet["time"]
+						last_snapshot = packet["data"]
+						
+						var recv_time = Time.get_unix_time_from_system()
+						var latency = recv_time - sent_time
+						print("latency = " , latency)
+						
 			if last_snapshot:
 				manager.apply_game_state(last_snapshot)
 		# Rate-limited paddle send — must include \n so host buffer can split correctly
