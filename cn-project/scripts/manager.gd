@@ -67,10 +67,12 @@ func _process(_delta: float) -> void:
 						UDPPacketBroadcaster.set_dest_address(UDPPacketReceiver.get_packet_ip(), LOBBY_RECEIVER_PORT)
 						UDPPacketBroadcaster.put_packet(PackedByteArray([0]))
 						UDPPacketBroadcaster.set_dest_address(clientIP, LOBBY_RECEIVER_PORT)
-					lobbyFull = true
-					get_node("Menu/Lobby Menu/Start").set_disabled(false)
-					get_node("Menu/Lobby Menu/Player2").set_text(packet.get_string_from_ascii().right(-1))
-					clientIP = UDPPacketReceiver.get_packet_ip()
+					else:
+						lobbyFull = true
+						get_node("Menu/Lobby Menu/Start").set_disabled(false)
+						get_node("Menu/Lobby Menu/Player2").set_text(packet.get_string_from_ascii().right(-1))
+						clientIP = UDPPacketReceiver.get_packet_ip()
+						print(clientIP)
 					
 					var namePacket: PackedByteArray = PackedByteArray([4])
 					namePacket.append_array(playerName.to_ascii_buffer())
@@ -100,10 +102,10 @@ func _process(_delta: float) -> void:
 						get_node("Game/Right").locally_owned = true
 						timer_2.start()
 						inMenu = false
-						UDPPacketBroadcaster.set_dest_address(hostIP, GAME_RECEIVER_PORT)
 						UDPPacketReceiver.close()
 						UDPPacketReceiver.bind(GAME_RECEIVER_PORT)
 						UDPPacketBroadcaster.close()
+						UDPPacketBroadcaster.set_dest_address(hostIP, GAME_RECEIVER_PORT)
 						UDPPacketBroadcaster.bind(GAME_BROADCAST_PORT)
 					elif packet[0] == 4: # host sent you their name
 						var hostName: String = packet.get_string_from_ascii().right(-1)
@@ -231,12 +233,11 @@ func join_lobby(lobbyData: Dictionary) -> void:
 	get_node("Menu/Join Menu").hide()
 	
 	hostIP = lobbyData["IP Address"]
+	print(hostIP)
 	get_node("Menu/Lobby Menu/Name").set_text(lobbyData["Name"])
 	get_node("Menu/Lobby Menu/Player1").set_text(hostIP)
 	get_node("Menu/Lobby Menu/Player2").set_text(playerName)
-	UDPPacketBroadcaster.close()
 	UDPPacketBroadcaster.set_dest_address(hostIP, LOBBY_RECEIVER_PORT)
-	UDPPacketBroadcaster.bind(LOBBY_BROADCAST_PORT)
 	var joinRequestPacket: PackedByteArray = PackedByteArray([2])
 	joinRequestPacket.append_array(playerName.to_ascii_buffer())
 	UDPPacketBroadcaster.put_packet(joinRequestPacket)
