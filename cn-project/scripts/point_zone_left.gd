@@ -19,10 +19,10 @@ func _on_timer_timeout() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	#Engine.time_scale = 0.5
+	timer.start()
 	if get_parent().get_parent().inLobby:
 		return
 	add_point()
-	timer.start()
 
 func add_point():
 	score += 1

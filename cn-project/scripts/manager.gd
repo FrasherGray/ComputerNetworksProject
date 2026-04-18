@@ -298,7 +298,11 @@ func client_started_LAN_game(timeSinceConfirm: float) -> void:
 	get_node("Game").show()
 	get_node("Game/Left").locally_owned = true
 	get_node("Game/Right").locally_owned = false
-	timer_2.set_wait_time(3 - (Time.get_unix_time_from_system() - timeSinceConfirm))
+	var currentTime: float = Time.get_unix_time_from_system()
+	if currentTime - timeSinceConfirm > 3:
+		timer_2.set_wait_time(0.1)
+	else:
+		timer_2.set_wait_time(3 - ( - timeSinceConfirm))
 	timer_2.start()
 	inMenu = false
 	UDPPacketReceiver.close()
