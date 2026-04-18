@@ -176,6 +176,7 @@ func ballBounced(newVelocity: Vector2i) -> void:
 	var ballVelocity: Vector2 = get_node("Game/Ball").get_global_position()
 	velocityPacket.append_array([roundi(ballVelocity.x / 255.0), int(ballVelocity.x) % 255, roundi(ballVelocity.x / 255.0), int(ballVelocity.x) % 255])
 	UDPPacketBroadcaster.put_packet(velocityPacket)
+	print("...to client")
 
 func setupHost() -> bool:
 	UDPPacketBroadcaster = PacketPeerUDP.new()
@@ -215,6 +216,13 @@ func requestLobbyData() -> void:
 			continue
 		get_node("Menu/Join Menu/Panel/ServerInfo").get_child(c).queue_free()
 	UDPPacketBroadcaster.put_packet(PackedByteArray([1]))
+
+func sendMessage(text: String) -> void:
+	var message: PackedByteArray = PackedByteArray([5])
+	message.append_array(text.to_ascii_buffer())
+	print(UDPPacketBroadcaster.is_socket_connected())
+	if UDPPacketBroadcaster.is_socket_connected():
+		UDPPacketBroadcaster.put_packet(message)
 
 # UI 
 func edit_player_name(newName: String) -> void:

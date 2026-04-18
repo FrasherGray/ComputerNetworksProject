@@ -13,11 +13,7 @@ func _process(delta: float) -> void:
 	messageSentCounter += delta
 	if messageQueue.size() != 0 and messageSentCounter > 0.2:
 		messageSentCounter = 0.0
-		var message: PackedByteArray = PackedByteArray([5])
-		message.append_array(messageQueue[0].to_ascii_buffer())
-		print(manager.UDPPacketBroadcaster.is_socket_connected())
-		if manager.UDPPacketBroadcaster.is_socket_connected():
-			manager.UDPPacketBroadcaster.put_packet(message)
+		manager.sendMessage(messageQueue[0])
 
 func addMessage(text: String, sender: String) -> void:
 	var message = Label.new()

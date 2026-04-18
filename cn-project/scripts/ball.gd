@@ -28,6 +28,7 @@ func _physics_process(delta):
 	velocity.y = roundi(velocity.y)
 	
 	if get_parent().get_parent().isHost:
+		print("Sending bounce data...")
 		get_parent().get_parent().ballBounced(velocity)
 
 func _on_timer_timeout():
