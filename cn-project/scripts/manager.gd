@@ -135,8 +135,11 @@ func _process(_delta: float) -> void:
 					else:
 						get_node("Game/Left").global_position.y = packet[1] * 255 + packet[2]
 				1: # ball bounced
-					var newVelocity: Vector2 = Vector2(packet[1] + packet[2], packet[3] + packet[4])
-					var synchronizedPosition: Vector2 = Vector2(packet[5] * 255 + packet[6], packet[7] * 255 + packet[8])
+					var timeSent: float = packet.decode_float(1)
+					if Time.get_unix_time_from_system() - timeSent > 0.1:
+						return
+					var newVelocity: Vector2 = Vector2(packet[5] + packet[6], packet[7] + packet[8])
+					var synchronizedPosition: Vector2 = Vector2(packet[9] * 255 + packet[10], packet[11] * 255 + packet[12])
 					get_node("Game/Ball").velocity = newVelocity
 					get_node("Game/Ball").set_global_position(synchronizedPosition)
 				2: # host recorded a point
@@ -164,7 +167,10 @@ func _physics_process(_delta: float) -> void:
 		sentPositionTicker += 1
 
 func ballBounced(newVelocity: Vector2i) -> void:
-	var velocityPacket: PackedByteArray = PackedByteArray([1])
+	var velocityPacket: PackedByteArray = PackedByteArray([1, 0, 0, 0, 0])
+	var currentTime: float = Time.get_unix_time_from_system()
+	velocityPacket.encode_float(1, currentTime)
+	
 	if newVelocity.x > 255:
 		velocityPacket.append_array([newVelocity.x - 255, 255])
 	else:
@@ -176,7 +182,6 @@ func ballBounced(newVelocity: Vector2i) -> void:
 	var ballVelocity: Vector2 = get_node("Game/Ball").get_global_position()
 	velocityPacket.append_array([roundi(ballVelocity.x / 255.0), int(ballVelocity.x) % 255, roundi(ballVelocity.x / 255.0), int(ballVelocity.x) % 255])
 	UDPPacketBroadcaster.put_packet(velocityPacket)
-	print("...to client")
 
 func setupHost() -> bool:
 	UDPPacketBroadcaster = PacketPeerUDP.new()
@@ -220,9 +225,7 @@ func requestLobbyData() -> void:
 func sendMessage(text: String) -> void:
 	var message: PackedByteArray = PackedByteArray([5])
 	message.append_array(text.to_ascii_buffer())
-	print(UDPPacketBroadcaster.is_socket_connected())
-	if UDPPacketBroadcaster.is_socket_connected():
-		UDPPacketBroadcaster.put_packet(message)
+	UDPPacketBroadcaster.put_packet(message)
 
 # UI 
 func edit_player_name(newName: String) -> void:
