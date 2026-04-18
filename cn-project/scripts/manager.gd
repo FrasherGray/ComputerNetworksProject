@@ -179,8 +179,8 @@ func ballBounced(newVelocity: Vector2i) -> void:
 		velocityPacket.append_array([newVelocity.y - 255, 255])
 	else:
 		velocityPacket.append_array([0, newVelocity.y])
-	var ballVelocity: Vector2 = get_node("Game/Ball").get_global_position()
-	velocityPacket.append_array([roundi(ballVelocity.x / 255.0), int(ballVelocity.x) % 255, roundi(ballVelocity.x / 255.0), int(ballVelocity.x) % 255])
+	var ballPosition: Vector2 = get_node("Game/Ball").get_global_position()
+	velocityPacket.append_array([roundi(ballPosition.x / 255.0), int(ballPosition.x) % 255, roundi(ballPosition.y / 255.0), int(ballPosition.y) % 255])
 	UDPPacketBroadcaster.put_packet(velocityPacket)
 
 func setupHost() -> bool:
