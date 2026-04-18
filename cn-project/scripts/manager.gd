@@ -291,6 +291,9 @@ func create_host_lobby() -> void:
 func start_LAN_game():
 	get_node("Menu/Lobby Menu/Start").set_disabled(true)
 	UDPPacketBroadcaster.put_packet(PackedByteArray([3]))
+	while inMenu:
+		await get_tree().create_timer(0.6).timeout
+		UDPPacketBroadcaster.put_packet(PackedByteArray([3]))
 
 func client_started_LAN_game(timeSinceConfirm: float) -> void:
 	print("I AM THE HOST")
