@@ -138,8 +138,8 @@ func _process(_delta: float) -> void:
 					var timeSent: float = packet.decode_float(1)
 					if Time.get_unix_time_from_system() - timeSent > 0.1:
 						return
-					var newVelocity: Vector2 = Vector2(packet[5] + packet[6], packet[7] + packet[8])
-					var synchronizedPosition: Vector2 = Vector2(packet[9] * 255 + packet[10], packet[11] * 255 + packet[12])
+					var newVelocity: Vector2 = Vector2(pow(-1, packet[5]) * (packet[6] + packet[7]), pow(-1, packet[8]) * packet[9] + packet[10])
+					var synchronizedPosition: Vector2 = Vector2(packet[11] * 255 + packet[12], packet[13] * 255 + packet[14])
 					get_node("Game/Ball").velocity = newVelocity
 					get_node("Game/Ball").set_global_position(synchronizedPosition)
 				2: # host recorded a point
@@ -171,14 +171,16 @@ func ballBounced(newVelocity: Vector2i) -> void:
 	var currentTime: float = Time.get_unix_time_from_system()
 	velocityPacket.encode_float(1, currentTime)
 	
-	if newVelocity.x > 255:
-		velocityPacket.append_array([newVelocity.x - 255, 255])
+	velocityPacket.append(newVelocity.x < 0)
+	if abs(newVelocity.x) > 255:
+		velocityPacket.append_array([abs(newVelocity.x) - 255, 255])
 	else:
-		velocityPacket.append_array([0, newVelocity.x])
-	if newVelocity.y > 255:
-		velocityPacket.append_array([newVelocity.y - 255, 255])
+		velocityPacket.append_array([0, abs(newVelocity.x)])
+	velocityPacket.append(newVelocity.y < 0)
+	if abs(newVelocity.y) > 255:
+		velocityPacket.append_array([abs(newVelocity.y) - 255, 255])
 	else:
-		velocityPacket.append_array([0, newVelocity.y])
+		velocityPacket.append_array([0, abs(newVelocity.y)])
 	var ballPosition: Vector2 = get_node("Game/Ball").get_global_position()
 	velocityPacket.append_array([roundi(ballPosition.x / 255.0), int(ballPosition.x) % 255, roundi(ballPosition.y / 255.0), int(ballPosition.y) % 255])
 	UDPPacketBroadcaster.put_packet(velocityPacket)
