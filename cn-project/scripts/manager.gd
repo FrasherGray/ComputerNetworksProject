@@ -77,7 +77,7 @@ func _process(_delta: float) -> void:
 					var namePacket: PackedByteArray = PackedByteArray([4])
 					namePacket.append_array(playerName.to_ascii_buffer())
 				elif packet[0] == 3:
-					client_started_LAN_game(packet.decode_float(1))
+					client_started_LAN_game(packet.decode_double(1))
 				elif packet[0] == 5:
 					var textMessage: String = packet.get_string_from_ascii().right(-1)
 					get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player2").get_text())
@@ -94,8 +94,8 @@ func _process(_delta: float) -> void:
 						requestLobbyData()
 					elif packet[0] == 3: # host starting game
 						print("I AM THE CLIENT")
-						var newPacket: PackedByteArray = PackedByteArray([3, 0, 0, 0, 0])
-						newPacket.encode_float(1, Time.get_unix_time_from_system())
+						var newPacket: PackedByteArray = PackedByteArray([3, 0, 0, 0, 0, 0, 0, 0, 0])
+						newPacket.encode_double(1, Time.get_unix_time_from_system())
 						UDPPacketBroadcaster.put_packet(newPacket)
 						get_node("Menu/Lobby Menu").hide()
 						get_node("Game").show()
@@ -135,7 +135,7 @@ func _process(_delta: float) -> void:
 					else:
 						get_node("Game/Left").global_position.y = packet[1] * 255 + packet[2]
 				1: # ball bounced
-					var timeSent: float = packet.decode_float(1)
+					var timeSent: float = packet.decode_double(1)
 					if Time.get_unix_time_from_system() - timeSent > 0.1:
 						return
 					var newVelocity: Vector2 = Vector2(pow(-1, packet[5]) * (packet[6] + packet[7]), pow(-1, packet[8]) * packet[9] + packet[10])
@@ -169,7 +169,7 @@ func _physics_process(_delta: float) -> void:
 func ballBounced(newVelocity: Vector2i) -> void:
 	var velocityPacket: PackedByteArray = PackedByteArray([1, 0, 0, 0, 0])
 	var currentTime: float = Time.get_unix_time_from_system()
-	velocityPacket.encode_float(1, currentTime)
+	velocityPacket.encode_double(1, currentTime)
 	
 	velocityPacket.append(newVelocity.x < 0)
 	if abs(newVelocity.x) > 255:
@@ -184,7 +184,8 @@ func ballBounced(newVelocity: Vector2i) -> void:
 	var ballPosition: Vector2 = get_node("Game/Ball").get_global_position()
 	velocityPacket.append_array([roundi(ballPosition.x / 255.0), int(ballPosition.x) % 255, roundi(ballPosition.y / 255.0), int(ballPosition.y) % 255])
 	UDPPacketBroadcaster.put_packet(velocityPacket)
-
+	print(ballPosition)
+	print(velocityPacket)
 func setupHost() -> bool:
 	UDPPacketBroadcaster = PacketPeerUDP.new()
 
@@ -304,10 +305,12 @@ func client_started_LAN_game(timeSinceConfirm: float) -> void:
 	get_node("Game/Left").locally_owned = true
 	get_node("Game/Right").locally_owned = false
 	var currentTime: float = Time.get_unix_time_from_system()
+	print(3 - (currentTime - timeSinceConfirm))
 	if currentTime - timeSinceConfirm > 3:
 		timer_2.set_wait_time(0.1)
 	else:
-		timer_2.set_wait_time(3 - ( - timeSinceConfirm))
+
+		timer_2.set_wait_time(3 - (currentTime - timeSinceConfirm))
 	timer_2.start()
 	inMenu = false
 	UDPPacketReceiver.close()
