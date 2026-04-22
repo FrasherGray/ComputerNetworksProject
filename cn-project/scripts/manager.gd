@@ -186,6 +186,7 @@ func ballBounced(newVelocity: Vector2i) -> void:
 	UDPPacketBroadcaster.put_packet(velocityPacket)
 	print(ballPosition)
 	print(velocityPacket)
+
 func setupHost() -> bool:
 	UDPPacketBroadcaster = PacketPeerUDP.new()
 
@@ -309,7 +310,6 @@ func client_started_LAN_game(timeSinceConfirm: float) -> void:
 	if currentTime - timeSinceConfirm > 3:
 		timer_2.set_wait_time(0.1)
 	else:
-
 		timer_2.set_wait_time(3 - (currentTime - timeSinceConfirm))
 	timer_2.start()
 	inMenu = false
