@@ -13,10 +13,12 @@ func _ready():
 	var angle = [1,4,7,11].pick_random() * 30
 	
 	#convert to red
-	var rad = deg_to_rad(30)
+	var rad = deg_to_rad(angle)
 	var direction = Vector2(cos(rad), sin(rad))
 
 	velocity = direction.normalized() * SPEED
+	if get_parent().get_parent().isHost:
+		get_parent().get_parent().ballBounced(velocity)
 
 func _physics_process(delta):
 	var collision = move_and_collide(velocity * delta)
