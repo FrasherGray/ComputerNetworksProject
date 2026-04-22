@@ -122,7 +122,7 @@ shape = SubResource("WorldBoundaryShape2D_cphvb")
 [node name="Border" type="StaticBody2D" parent="Game" unique_id=735709460]
 
 [node name="Top" type="CollisionShape2D" parent="Game/Border" unique_id=1554861806]
-position = Vector2(576.5, -6.5)
+position = Vector2(576.5, -5.5)
 shape = SubResource("RectangleShape2D_o1c0c")
 
 [node name="Bottom" type="CollisionShape2D" parent="Game/Border" unique_id=918201004]
@@ -161,6 +161,42 @@ label_settings = SubResource("LabelSettings_o1c0c")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="Win Screen" type="Control" parent="Game" unique_id=52186161]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="Background" type="ColorRect" parent="Game/Win Screen" unique_id=1756010045]
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0, 0, 0, 1)
+
+[node name="Screen" type="Label" parent="Game/Win Screen" unique_id=2103792199]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_right = 250.0
+offset_bottom = 150.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 30
+text = "Victor:
+X!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Quit" type="Button" parent="Game/Win Screen" unique_id=2146630508]
+layout_mode = 0
+offset_left = 501.0
+offset_top = 440.0
+offset_right = 651.0
+offset_bottom = 485.0
+text = "Leave"
 
 [node name="Menu" type="Control" parent="." unique_id=943272792]
 layout_mode = 3
@@ -479,6 +515,7 @@ placeholder_text = "your online name"
 [connection signal="body_entered" from="Game/Point Zone Right" to="Game/Point Zone Right" method="_on_body_entered"]
 [connection signal="timeout" from="Game/Point Zone Right/Timer" to="Game/Point Zone Right" method="_on_timer_timeout"]
 [connection signal="draw" from="Game/left_lable" to="Game/Point Zone Right" method="_on_label_draw"]
+[connection signal="pressed" from="Game/Win Screen/Quit" to="." method="quit_game"]
 [connection signal="text_changed" from="Menu/Lobby Menu/Chat/Text" to="Menu/Lobby Menu/Chat" method="editMessage"]
 [connection signal="text_submitted" from="Menu/Lobby Menu/Chat/Text" to="Menu/Lobby Menu/Chat" method="sendMessage"]
 [connection signal="pressed" from="Menu/Lobby Menu/Start" to="." method="start_LAN_game"]
@@ -492,4 +529,5 @@ placeholder_text = "your online name"
 [connection signal="pressed" from="Menu/Multiplayer/Join" to="." method="browse_lobby_list"]
 [connection signal="pressed" from="Menu/Main/Local" to="." method="start_local_game"]
 [connection signal="pressed" from="Menu/Main/Online" to="." method="view_multiplayer_menu"]
+[connection signal="pressed" from="Menu/Main/Quit" to="." method="quit_game"]
 [connection signal="text_changed" from="Menu/Main/PlayerName" to="." method="edit_player_name"]

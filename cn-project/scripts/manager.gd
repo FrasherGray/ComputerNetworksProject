@@ -74,8 +74,9 @@ func _process(_delta: float) -> void:
 						clientIP = UDPPacketReceiver.get_packet_ip()
 						print("Client: ", clientIP)
 					
-					var namePacket: PackedByteArray = PackedByteArray([4])
-					namePacket.append_array(playerName.to_ascii_buffer())
+						var namePacket: PackedByteArray = PackedByteArray([4])
+						namePacket.append_array(playerName.to_ascii_buffer())
+						UDPPacketBroadcaster.put_packet(namePacket)
 				elif packet[0] == 3:
 					client_started_LAN_game()
 				elif packet[0] == 5:
@@ -135,9 +136,10 @@ func _process(_delta: float) -> void:
 						get_node("Game/Left").global_position.y = packet[1] * 255 + packet[2]
 				1: # ball bounced
 					print("matched 1")
-					var newVelocity: Vector2 = Vector2(pow(-1, packet[1]) * (packet[2] + packet[3]), pow(-1, packet[4]) * packet[5] + packet[6])
+					var newVelocity: Vector2 = Vector2(pow(-1, packet[1]) * (packet[2] + packet[3]), pow(-1, packet[4]) * (packet[5] + packet[6]))
 					print(newVelocity)
 					var synchronizedPosition: Vector2 = Vector2(packet[7] * 255 + packet[8], packet[9] * 255 + packet[10])
+					print(synchronizedPosition)
 					get_node("Game/Ball").velocity = newVelocity
 					get_node("Game/Ball").set_global_position(synchronizedPosition)
 				2: # host recorded a point
@@ -146,6 +148,8 @@ func _process(_delta: float) -> void:
 							get_node("Game/Point Zone Left").add_point()
 						1:
 							get_node("Game/Point Zone Right").add_point()
+				3: # host recorded a victory
+					win_game(not bool(packet[1]))
 
 func _physics_process(_delta: float) -> void:
 	if inMenu:
@@ -178,7 +182,7 @@ func ballBounced(newVelocity: Vector2i) -> void:
 	else:
 		velocityPacket.append_array([0, abs(newVelocity.y)])
 	var ballPosition: Vector2 = get_node("Game/Ball").get_global_position()
-	velocityPacket.append_array([roundi(ballPosition.x / 255.0), int(ballPosition.x) % 255, roundi(ballPosition.y / 255.0), int(ballPosition.y) % 255])
+	velocityPacket.append_array([floori(ballPosition.x / 255.0), int(ballPosition.x) % 255, floori(ballPosition.y / 255.0), int(ballPosition.y) % 255])
 	UDPPacketBroadcaster.put_packet(velocityPacket)
 	print(ballPosition)
 	print(velocityPacket)
@@ -327,3 +331,15 @@ func leave_lobby_menu() -> void:
 		UDPPacketBroadcaster.put_packet(PackedByteArray([0]))
 		lobbyFull = false
 	isHost = false
+
+func win_game(left: bool) -> void:
+	var winner: String = "None"
+	if left:
+		winner = get_node("Menu/Lobby Menu/Player1").get_text()
+	else:
+		winner = get_node("Menu/Lobby Menu/Player2").get_text()
+	get_node("Game/Win Screen/Screen").set_text("Victor:\n" + winner + "!")
+	get_node("Game/Win Screen").show()
+
+func quit_game() -> void:
+	get_tree().quit()

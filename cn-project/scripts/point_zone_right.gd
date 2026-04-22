@@ -29,3 +29,6 @@ func add_point():
 	left_lable.text = str(score)
 	if get_parent().get_parent().isHost:
 		get_parent().get_parent().UDPPacketBroadcaster.put_packet(PackedByteArray([2, 1]))
+		if score == 5:
+			get_parent().get_parent().UDPPacketBroadcaster.put_packet(PackedByteArray([3, 1]))
+			get_parent().get_parent().win_game(false)
