@@ -77,7 +77,7 @@ func _process(_delta: float) -> void:
 					var namePacket: PackedByteArray = PackedByteArray([4])
 					namePacket.append_array(playerName.to_ascii_buffer())
 				elif packet[0] == 3:
-					client_started_LAN_game(packet.decode_double(1))
+					client_started_LAN_game()
 				elif packet[0] == 5:
 					var textMessage: String = packet.get_string_from_ascii().right(-1)
 					get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player2").get_text())
@@ -94,8 +94,7 @@ func _process(_delta: float) -> void:
 						requestLobbyData()
 					elif packet[0] == 3: # host starting game
 						print("I AM THE CLIENT")
-						var newPacket: PackedByteArray = PackedByteArray([3, 0, 0, 0, 0, 0, 0, 0, 0])
-						newPacket.encode_double(1, Time.get_unix_time_from_system())
+						var newPacket: PackedByteArray = PackedByteArray([3])
 						UDPPacketBroadcaster.put_packet(newPacket)
 						get_node("Menu/Lobby Menu").hide()
 						get_node("Game").show()
@@ -299,18 +298,12 @@ func start_LAN_game():
 		await get_tree().create_timer(0.6).timeout
 		UDPPacketBroadcaster.put_packet(PackedByteArray([3]))
 
-func client_started_LAN_game(timeSinceConfirm: float) -> void:
+func client_started_LAN_game() -> void:
 	print("I AM THE HOST")
 	get_node("Menu/Lobby Menu").hide()
 	get_node("Game").show()
 	get_node("Game/Left").locally_owned = true
 	get_node("Game/Right").locally_owned = false
-	var currentTime: float = Time.get_unix_time_from_system()
-	print(3 - (currentTime - timeSinceConfirm))
-	if currentTime - timeSinceConfirm > 3:
-		timer_2.set_wait_time(0.1)
-	else:
-		timer_2.set_wait_time(3 - (currentTime - timeSinceConfirm))
 	timer_2.start()
 	inMenu = false
 	UDPPacketReceiver.close()

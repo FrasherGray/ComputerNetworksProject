@@ -40,4 +40,3 @@ func _on_timer_timeout():
 func _on_timer_2_timeout():
 	set_physics_process(true)
 	timer.start()
-	timer_2.set_wait_time(3)
