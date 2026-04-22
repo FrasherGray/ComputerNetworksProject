@@ -33,13 +33,14 @@ func _ready() -> void:
 		IPAddress = IP.get_local_addresses()[5]
 	else:
 		IPAddress = IP.get_local_addresses()[0]
-	udp.bind(9998,"0.0.0.0")
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	clock = delta
 
 	if not host_menu.is_hosting and state == 0:
+		if not udp.is_bound():
+			udp.bind(9998, "0.0.0.0")
 		while udp.get_available_packet_count() > 0:
 			var packet = udp.get_packet()
 			if packet.size() == 0:
@@ -108,8 +109,8 @@ func _process(delta: float) -> void:
 						var sent_time = packet["time"]
 						last_snapshot = packet["data"]
 						
-						var recv_time = Time.get_time_string_from_system()
-						var latency = recv_time - sent_time
+						var recv_time = Time.get_unix_time_from_system()
+						var latency = recv_time - int(sent_time)
 						
 						avg_latency = lerp(avg_latency, float(latency), SMOOTHING)
 						latencyNode.text = "Latency: " + str(latency) + "ms"
@@ -135,7 +136,7 @@ func connect_to_server(ip: String, port: int):
 	
 	udp.close()
 	
-	var err = client.connect_to_host(ip, port)
+	var err = client.connect_to_host(ip, int(port))
 	if err != OK:
 		print("Connection Failed")
 	state = 1

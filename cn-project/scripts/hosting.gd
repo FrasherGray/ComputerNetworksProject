@@ -5,7 +5,6 @@ extends Control
 @onready var manager: Node = $"../.."
 
 var server := TCPServer.new()
-var port = 3000
 
 var clients = []
 
@@ -34,19 +33,13 @@ var client_recv_buf = ""      # accumulates raw TCP bytes until a full \n-delimi
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	print(IP.get_local_addresses())
-	listen_udp.bind(9999)
-	
-	var err = server.listen(3000, "0.0.0.0")
-	if err != OK:
-		print("Server Failed")
-		return
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	var server_info = {
 		"id": "MY_GAME",
 		"name": user_input,
-		"port": 3000
+		"port": 3001
 	}
 	
 	if is_hosting:
@@ -69,7 +62,7 @@ func _process(delta: float) -> void:
 			if not data.has("type"):
 				print("Data has incorrect type")
 				continue
-			ip_client = listen_udp.get_packet_ip()
+			ip_client = udp.get_packet_ip()
 			is_hosting = false
 			listen_udp.close()
 			udp.close()
@@ -111,7 +104,7 @@ func _process(delta: float) -> void:
 			# Send snapshot at a fixed rate to avoid flooding the TCP buffer
 			if timer >= SEND_RATE:
 				var packet = {
-					"time": Time.get_time_string_from_system(),
+					"time": Time.get_unix_time_from_system(),
 					"data": manager.update_physics()
 				}
 				peer.put_data((JSON.stringify(packet) + "\n").to_utf8_buffer())
@@ -125,14 +118,33 @@ func _on_line_edit_text_submitted(new_text: String) -> void:
 	setup_server()
 	is_hosting = true
 	
+	
+	
+func _get_local_ip() -> String:
+	for addr in IP.get_local_addresses():
+		if addr.begins_with("192.") or addr.begins_with("10.") or addr.begins_with("172."):
+			var parts := addr.split(".")
+			if parts.size() == 4:
+				parts[2] = "255"
+				parts[3] = "255"
+				return ".".join(parts)
+	return "255.255.255.255"  # global broadcast fallback
+
 
 func setup_server():
 	if udp.is_bound():
 		udp.close()
 
+	var ipLocal = _get_local_ip()
+	
 	udp.bind(9999,"0.0.0.0")
 	udp.set_broadcast_enabled(true)
-	udp.set_dest_address("26.20.185.15", 9998)
+	udp.set_dest_address(ipLocal, 9998)
+	
+	if not server.is_listening():
+		var err = server.listen(3001, "0.0.0.0")
+		if err != OK:
+			print("TCP Server listen failed: ", err)
 
 func on_connection():
 	connection.text = "Connection Successfull!"
