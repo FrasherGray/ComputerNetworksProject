@@ -134,11 +134,10 @@ func _process(_delta: float) -> void:
 					else:
 						get_node("Game/Left").global_position.y = packet[1] * 255 + packet[2]
 				1: # ball bounced
-					var timeSent: float = packet.decode_float(1)
-					if Time.get_unix_time_from_system() - timeSent > 0.1:
-						return
-					var newVelocity: Vector2 = Vector2(pow(-1, packet[5]) * (packet[6] + packet[7]), pow(-1, packet[8]) * packet[9] + packet[10])
-					var synchronizedPosition: Vector2 = Vector2(packet[11] * 255 + packet[12], packet[13] * 255 + packet[14])
+					print("matched 1")
+					var newVelocity: Vector2 = Vector2(pow(-1, packet[1]) * (packet[2] + packet[3]), pow(-1, packet[4]) * packet[5] + packet[6])
+					print(newVelocity)
+					var synchronizedPosition: Vector2 = Vector2(packet[7] * 255 + packet[8], packet[9] * 255 + packet[10])
 					get_node("Game/Ball").velocity = newVelocity
 					get_node("Game/Ball").set_global_position(synchronizedPosition)
 				2: # host recorded a point
@@ -166,9 +165,7 @@ func _physics_process(_delta: float) -> void:
 		sentPositionTicker += 1
 
 func ballBounced(newVelocity: Vector2i) -> void:
-	var velocityPacket: PackedByteArray = PackedByteArray([1, 0, 0, 0, 0])
-	var currentTime: float = Time.get_unix_time_from_system()
-	velocityPacket.encode_float(1, currentTime)
+	var velocityPacket: PackedByteArray = PackedByteArray([1])
 
 	velocityPacket.append(newVelocity.x < 0)
 	if abs(newVelocity.x) > 255:

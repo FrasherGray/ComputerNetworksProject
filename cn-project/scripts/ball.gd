@@ -31,11 +31,12 @@ func _physics_process(delta):
 		get_parent().get_parent().ballBounced(velocity)
 
 func _on_timer_timeout():
-	if(SPEED >= 500):
-		SPEED = 500
-	else:
-		SPEED += 10
-	velocity = velocity.normalized() * SPEED
+	pass
+	#if(SPEED >= 500):
+		#SPEED = 500
+	#else:
+		#SPEED += 10
+	#velocity = velocity.normalized() * SPEED
 	
 func _on_timer_2_timeout():
 	set_physics_process(true)
