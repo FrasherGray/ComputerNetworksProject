@@ -13,7 +13,7 @@ func _ready():
 	var angle = [1,4,7,11].pick_random() * 30
 	
 	#convert to red
-	var rad = deg_to_rad(angle)
+	var rad = deg_to_rad(30)
 	var direction = Vector2(cos(rad), sin(rad))
 
 	velocity = direction.normalized() * SPEED
