@@ -123,7 +123,7 @@ func _process(_delta: float) -> void:
 						UDPPacketBroadcaster.put_packet(PackedByteArray([6]))
 					elif packet[0] == 6:
 						get_node("Menu/Lobby Menu/Chat").addMessage(get_node("Menu/Lobby Menu/Chat").messageQueue[0], "")
-						get_node("Menu/Lobby Menu/Chat").messageQueue.erase(0)
+						get_node("Menu/Lobby Menu/Chat").messageQueue.remove_at(0)
 				elif packet.size() > 1:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())
 					get_node("Menu/Join Menu/Panel").add_row(packetData["Lobby"], UDPPacketReceiver.get_packet_ip(), 1)
