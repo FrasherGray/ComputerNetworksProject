@@ -125,7 +125,7 @@ func _get_local_ip() -> String:
 		if addr.begins_with("192.") or addr.begins_with("10.") or addr.begins_with("172."):
 			var parts := addr.split(".")
 			if parts.size() == 4:
-				parts[2] = "255"
+				# parts[2] = "255" 
 				parts[3] = "255"
 				return ".".join(parts)
 	return "255.255.255.255"  # global broadcast fallback
