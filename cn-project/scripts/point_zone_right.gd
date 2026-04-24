@@ -30,6 +30,6 @@ func add_point():
 	if get_parent().get_parent().isHost:
 		get_parent().get_parent().UDPPacketBroadcaster.put_packet(PackedByteArray([2, 1]))
 		if score == 5:
-			get_parent().get_parent().UDPPacketBroadcaster.put_packet(PackedByteArray([3, 1]))
+			get_parent().get_parent().UDPPacketBroadcaster.put_packet(PackedByteArray([4, 1]))
 			get_parent().get_parent().win_game(false)
 	get_parent().get_parent().get_node("Game/Ball").SPEED += 50

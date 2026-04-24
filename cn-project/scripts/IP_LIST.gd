@@ -2,7 +2,7 @@ extends Panel
 @onready var join_menu: Control = $".."
 @onready var server_info: VBoxContainer = $ServerInfo
 
-var Headers_IP_INFO = ["Name","IP Address", "Player Count", "Join"]
+var Headers_IP_INFO = ["Lobby","Host Name", "Player Count", "Join"]
 var IP_INFO = []
 
 # Called when the node enters the scene tree for the first time.
@@ -60,8 +60,8 @@ func create_row(row):
 	server_info.add_child(row_container)
 	print("Row added:", row["Name"])
 
-func add_row(name, ip, count):
-	var new_row = {"Name":name,"IP Address":ip, "Player Count": count}
+func add_row(name, ip, player, count):
+	var new_row = {"Lobby":name,"Host Name":player, "Player Count": count, "IP Address": ip}
 	IP_INFO.append(new_row)
 	create_row(new_row)
 

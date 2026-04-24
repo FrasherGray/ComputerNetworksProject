@@ -126,7 +126,7 @@ func _process(_delta: float) -> void:
 						get_node("Menu/Lobby Menu/Chat").messageQueue.remove_at(0)
 				elif packet.size() > 1:
 					var packetData: Dictionary = JSON.parse_string(packet.get_string_from_ascii())
-					get_node("Menu/Join Menu/Panel").add_row(packetData["Lobby"], UDPPacketReceiver.get_packet_ip(), 1)
+					get_node("Menu/Join Menu/Panel").add_row(packetData["Lobby"], UDPPacketReceiver.get_packet_ip(), packetData["Player"], 1)
 		else:
 			match packet[0]:
 				0: # other player moved paddle
@@ -148,7 +148,7 @@ func _process(_delta: float) -> void:
 							get_node("Game/Point Zone Left").add_point()
 						1:
 							get_node("Game/Point Zone Right").add_point()
-				3: # host recorded a victory
+				4: # host recorded a victory
 					win_game(not bool(packet[1]))
 
 func _physics_process(_delta: float) -> void:
@@ -262,8 +262,8 @@ func join_lobby(lobbyData: Dictionary) -> void:
 	
 	hostIP = lobbyData["IP Address"]
 	print("Host: ", hostIP)
-	get_node("Menu/Lobby Menu/Name").set_text(lobbyData["Name"])
-	get_node("Menu/Lobby Menu/Player1").set_text(hostIP)
+	get_node("Menu/Lobby Menu/Name").set_text(lobbyData["Lobby"])
+	get_node("Menu/Lobby Menu/Player1").set_text(lobbyData["Host Name"])
 	get_node("Menu/Lobby Menu/Player2").set_text(playerName)
 	UDPPacketBroadcaster.set_dest_address(hostIP, LOBBY_RECEIVER_PORT)
 	var joinRequestPacket: PackedByteArray = PackedByteArray([2])
