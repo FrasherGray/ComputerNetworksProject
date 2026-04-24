@@ -73,10 +73,6 @@ func _process(_delta: float) -> void:
 						get_node("Menu/Lobby Menu/Player2").set_text(packet.get_string_from_ascii().right(-1))
 						clientIP = UDPPacketReceiver.get_packet_ip()
 						print("Client: ", clientIP)
-					
-						var namePacket: PackedByteArray = PackedByteArray([4])
-						namePacket.append_array(playerName.to_ascii_buffer())
-						UDPPacketBroadcaster.put_packet(namePacket)
 				elif packet[0] == 3:
 					client_started_LAN_game()
 				elif packet[0] == 5:
@@ -114,9 +110,6 @@ func _process(_delta: float) -> void:
 							print("Broadcaster set up for Game")
 						else:
 							print("Broadcaster failed to set up for Game")
-					elif packet[0] == 4: # host sent you their name
-						var hostName: String = packet.get_string_from_ascii().right(-1)
-						get_node("Menu/Lobby Menu/Player1").set_text(hostName)
 					elif packet[0] == 5:
 						var textMessage: String = packet.get_string_from_ascii().right(-1)
 						get_node("Menu/Lobby Menu/Chat").addMessage(textMessage, get_node("Menu/Lobby Menu/Player1").get_text())
@@ -149,7 +142,7 @@ func _process(_delta: float) -> void:
 						1:
 							get_node("Game/Point Zone Right").add_point()
 				4: # host recorded a victory
-					win_game(not bool(packet[1]))
+					win_game(bool(packet[1]))
 
 func _physics_process(_delta: float) -> void:
 	if inMenu:

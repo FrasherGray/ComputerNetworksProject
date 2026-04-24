@@ -58,7 +58,7 @@ func create_row(row):
 		row_container.add_child(column)
 			
 	server_info.add_child(row_container)
-	print("Row added:", row["Name"])
+	print("Row added:", row["Lobby"])
 
 func add_row(name, ip, player, count):
 	var new_row = {"Lobby":name,"Host Name":player, "Player Count": count, "IP Address": ip}
