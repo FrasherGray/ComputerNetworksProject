@@ -1,7 +1,6 @@
 extends CharacterBody2D
 
 var SPEED = 350
-@onready var timer: Timer = $Timer
 @onready var timer_2: Timer = $Timer2
 
 
@@ -17,8 +16,6 @@ func _ready():
 	var direction = Vector2(cos(rad), sin(rad))
 
 	velocity = direction.normalized() * SPEED
-	if get_parent().get_parent().isHost:
-		get_parent().get_parent().ballBounced(velocity)
 
 func _physics_process(delta):
 	var collision = move_and_collide(velocity * delta)
@@ -31,15 +28,8 @@ func _physics_process(delta):
 	
 	if get_parent().get_parent().isHost:
 		get_parent().get_parent().ballBounced(velocity)
-
-func _on_timer_timeout():
-	pass
-	#if(SPEED >= 500):
-		#SPEED = 500
-	#else:
-		#SPEED += 10
-	#velocity = velocity.normalized() * SPEED
 	
 func _on_timer_2_timeout():
+	if get_parent().get_parent().isHost:
+		get_parent().get_parent().ballBounced(velocity)
 	set_physics_process(true)
-	timer.start()
