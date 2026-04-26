@@ -1,7 +1,6 @@
 extends CharacterBody2D
 
 var SPEED = 350
-@onready var timer: Timer = $Timer
 @onready var timer_2: Timer = $Timer2
 @onready var manager: Node = $"../.."
 
@@ -28,14 +27,6 @@ func _physics_process(delta):
 	
 	manager.pass_ball_data(velocity)
 
-func _on_timer_timeout():
-	if(SPEED >= 500):
-		SPEED = 500
-	else:
-		SPEED += 10
-	velocity = velocity.normalized() * SPEED
-	
 func _on_timer_2_timeout():
 	print("timer2")
 	set_physics_process(true)
-	$Timer.start()

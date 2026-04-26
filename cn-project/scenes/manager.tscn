@@ -95,9 +95,6 @@ script = ExtResource("4_gq280")
 offset_right = 25.0
 offset_bottom = 25.0
 
-[node name="Timer" type="Timer" parent="Game/Ball" unique_id=1269121768]
-wait_time = 5.0
-
 [node name="Timer2" type="Timer" parent="Game/Ball" unique_id=602347389]
 wait_time = 3.0
 one_shot = true
@@ -383,7 +380,6 @@ offset_bottom = 36.0
 grow_horizontal = 0
 text = "Quit to Desktop"
 
-[connection signal="timeout" from="Game/Ball/Timer" to="Game/Ball" method="_on_timer_timeout"]
 [connection signal="timeout" from="Game/Ball/Timer2" to="Game/Ball" method="_on_timer_2_timeout"]
 [connection signal="body_entered" from="Game/Point Zone Left" to="Game/Point Zone Left" method="_on_body_entered"]
 [connection signal="timeout" from="Game/Point Zone Left/Timer" to="Game/Point Zone Left" method="_on_timer_timeout"]

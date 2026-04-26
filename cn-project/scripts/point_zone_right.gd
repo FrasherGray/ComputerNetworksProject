@@ -20,5 +20,6 @@ func _on_body_entered(body: Node2D) -> void:
 func add_point():
 	score += 1
 	left_lable.text = str(score)
+	get_parent().get_parent().get_node("Game/Ball").SPEED += 50
 	if score >= WIN_SCORE:
 		manager.game_over("Left")

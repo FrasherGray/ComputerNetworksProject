@@ -101,4 +101,6 @@ func game_over(winner: String):
 	main.show()
 	#var Host = hosting.avg_latency
 	var Client = server_browser.avg_latency
+	
+	print(winner)
 	print("Client Latency:", Client, "MS")
